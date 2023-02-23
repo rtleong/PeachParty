@@ -11,7 +11,7 @@ public:
 	Actor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth) 
 		: GraphObject(imageID, startX, startY, startDirection, depth), m_world(world) {};
 	virtual void doSomething() = 0;
-	StudentWorld* world() { return m_world; }
+	StudentWorld* getWorld() { return m_world; }
 
 private:
 	StudentWorld* m_world;
@@ -28,8 +28,12 @@ public:
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
 	bool deactivate() { activate = false; 
 							return; }
+	bool waitingToRoll() { return waitingtoroll; }
+	bool isWalking() { waitingtoroll = false; 
+	return; }
 private:
 	bool activate;
+	bool waitingtoroll;
 };
 
 //class MainActors : public AliveActor //alive actors -> main actors  (probably will never need to be deactivated)
@@ -46,8 +50,9 @@ class Peach : public AliveActor //main actors ->  Peach
 public:
 	Peach(StudentWorld* world, double startX, double startY)
 		: AliveActor(world, IID_PEACH, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY, right) {};//right initializes peach with starting direction of right
+	virtual void doSomething();
 private:
-
+	
 };
 
 class Yoshi : public AliveActor //MainActors -> Yoshi
