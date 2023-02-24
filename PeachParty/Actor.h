@@ -97,6 +97,7 @@ class BoardActor : public Actor
 public:
 	BoardActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
 		: Actor(world, imageID, startX, startY, startDirection, depth), m_activated(true) {};
+	virtual void doSomething();
 	bool isActivated() { return m_activated; }
 	void deActivate() { m_activated = false; }
 
@@ -109,6 +110,7 @@ class CoinSquare : BoardActor
 public:
 	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
 		: BoardActor(world, IID_BLUE_COIN_SQUARE, startX, startY, 0, 1) {};
+	virtual void doSomething();
 private:
 
 

@@ -44,11 +44,22 @@ void Peach::doSomething() {
 	}
 	//continue with step 2 below
 	if (checkRollStatus()) { //if walking, move as spec indicates
+		if () {
 
+		}
 
 
 	}
 				//if avatar is in walking state
 					//if avatar cant move forward in current direction, update avatars walk direction so it 
 					//can turn a new direction perpendicular to the current walking direction
+}
+
+void CoinSquare::doSomething() {
+	if (!isActivated()) {
+		return;
+	}
+	else {
+
+	}
 }

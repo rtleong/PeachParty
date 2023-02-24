@@ -90,5 +90,5 @@ bool StudentWorld::ValidMove(double x, double y) {
             }
         }
     }
-    return true; //move
+    return true;
 }
