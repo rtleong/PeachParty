@@ -35,7 +35,7 @@ int StudentWorld::init()
 {
     {
         Board bd; //given code, reads in board
-        string board_file = assetPath() + "board01.txt";
+        string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt";
         Board::LoadResult result = bd.loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
             cerr << "Could not find board01.txt data file\n";
@@ -49,24 +49,25 @@ int StudentWorld::init()
                     Board::GridEntry ge = bd.getContentsOf(x, y); //instead of 5, 10 get x, y
                     switch (ge) {
                     case Board::empty:
-                        cerr << "Location" << x << " " << y << " is empty.";
+                        cerr << "Location " << x << " " << y << " is empty.\n";
                         break;
                     case Board::boo:
-                        cout << "Location" << x << " " << y << " has a boo.";
+                        cout << "Location " << x << " " << y << " has a boo.\n";
                         break;
                     case Board::bowser:
-                        cerr << "Location" << x << " " << y << " has a bowser";
+                        cerr << "Location " << x << " " << y << " has a bowser.\n";
                         break;
                     case Board::player:
-                        cerr << "Location" << x << " " << y << " has a player Yoshi and Peach";
+                        cerr << "Location " << x << " " << y << " has a player Yoshi and Peach\n";
                         insertPeach(x, y);
                         break;
                     case Board::red_coin_square:
-                        cerr << "Location" << x << " " << y << " has a red coin square";
+                        cerr << "Location " << x << " " << y << " has a red coin square\n";
                         break;
                     case Board::blue_coin_square:
-                        cerr << "Location" << x << " " << y << " has a blue coin square";
+                        cerr << "Location " << x << " " << y << " has a blue coin square\n";
                         insertBlueSquare(x, y);
+                        break;
                         // etc… //given implementation of board 
                     }
                 }
@@ -104,7 +105,7 @@ void StudentWorld::cleanUp()
 
 }
 
-bool StudentWorld::ValidMove(double x, double y) {
+bool StudentWorld::validPos(double x, double y) {
     for (auto a : actors) {
         if (x + SPRITE_WIDTH - 1 > a->getX() && x < a->getX() + SPRITE_WIDTH - 1) { //if x is out of bounds dont move or y is out of bounds dont move
             if (y + SPRITE_HEIGHT - 1 > a->getY() && y < a->getY() + SPRITE_HEIGHT - 1) { // or y is out of bounds dont move

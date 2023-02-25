@@ -17,7 +17,7 @@ public:
   virtual int move();
   virtual void cleanUp();
   ~StudentWorld();
-  bool ValidMove(double x, double y);
+  bool validPos(double x, double y);
   bool insertPeach(double x, double y);
   bool insertBlueSquare(double x, double y);
 

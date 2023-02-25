@@ -5,14 +5,17 @@
 
 class StudentWorld;
 
-//void Peach::
+void Peach::playerMove(double x1, double y1) {
+	if (getWorld->validPos(x1, y1)) {
+		moveTo(x1, y1);
+	}
+}
 
 void Peach::doSomething() {
 	if (checkRollStatus()) {
-		int key;
-		int die_roll;
-		int ticks_to_move;
-		switch (getWorld()->getAction(key)) //get Action returns an int, so the cases need to be ints
+		int key{};
+		if (getWorld()->getAction(key))
+		switch (key)//get Action returns an int, so the cases need to be ints
 		{
 		case ACTION_NONE:
 			break;

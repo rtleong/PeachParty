@@ -52,7 +52,9 @@ public:
 		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * startX, SPRITE_HEIGHT * startY, right) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
 private:
-
+	void playerMove(double x, double y);
+	int die_roll;
+	int ticks_to_move;
 };
 
 class Yoshi : public AliveActor //MainActors -> Yoshi
