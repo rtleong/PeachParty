@@ -29,16 +29,20 @@ GameWorld* createStudentWorld(string assetPath)
 
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
-{
-    m_peach = nullptr; //set the peach pointer to nullptr, she can be seperate from all actors
+{   
     actors.clear(); //clear all actors
+    m_board = new Board(); //update m_board to point at board
+
+    m_peach = nullptr; //set the peach pointer to nullptr, she can be seperate from all actors
+    
 }
 
 int StudentWorld::init()
 {
-        Board bd; //given code, reads in board
-        string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt";
-        Board::LoadResult result = bd.loadBoard(board_file);
+      //  Board bd; //given code, reads in board
+        startCountdownTimer(99);
+        string board_file = assetPath() + "board01.txt"  /*to_string(getBoardNumber()) + ".txt"*/;
+        Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
             cerr << "Could not find board01.txt data file\n";
         else if (result == Board::load_fail_bad_format)
@@ -48,7 +52,7 @@ int StudentWorld::init()
             //Board::GridEntry ge = bd.getContentsOf(5, 10); //x=5, y=10
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
-                    Board::GridEntry ge = bd.getContentsOf(x, y); //instead of 5, 10 get x, y
+                    Board::GridEntry ge = m_board->getContentsOf(x, y); //instead of 5, 10 get x, y
                     switch (ge) {
                     case Board::empty:
                         cerr << "Location " << x << " " << y << " is empty.\n";
@@ -106,6 +110,8 @@ void StudentWorld::cleanUp()
     delete m_peach; //delete peach
     m_peach = nullptr; //declare m_peach to nullptr so we crash if follow it ever
 
+    delete m_board;
+    m_board = nullptr;
 }
 
 bool StudentWorld::validPos(double x, double y) {
@@ -118,6 +124,6 @@ bool StudentWorld::validPos(double x, double y) {
         return true;
     }
     else {
-        return true; //fix this
+        return false; //fix this
     }
 }

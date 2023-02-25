@@ -26,8 +26,8 @@ public:
 	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection)
 		: Actor(world, imageID, startX, startY, startDirection, 0), activate(true) {};
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
-	virtual void deactivate() { activate = false; 
-							return; }
+	virtual void deactivate() { activate = false; return; }
+	virtual void doSomething() = 0;
 private:
 	bool activate;
 };
@@ -36,37 +36,39 @@ class Peach : public AliveActor //main actors ->  Peach
 {
 public:
 	Peach(StudentWorld* world, int boardX, int boardY)
-		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right) {};//right initializes peach with starting direction of right
+		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right) , waitingtoroll(true), 
+		rollStatus(waitingtoroll), player_side(0), walkingDirection(right) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
+	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
-	virtual void isWaitingtoRoll() { waitingtoroll = true; return; }
-	virtual void isWalking() {
-		waitingtoroll = false; return;
-	}
+	int getWalking();
 private:
 	void playerMove(double x, double y);
-	int die_roll;
-	int ticks_to_move;
-	bool waitingtoroll = true;
+	int walkingDirection;
+	int player_side;
+	int ticks_to_move = 0;
+	bool rollStatus;
+	bool waitingtoroll;
+	bool walking = false;
 };
 
 class CoinSquare : public AliveActor {
 public:
 	CoinSquare(StudentWorld* world, double startX, double startY)
 		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right) {};
-	void doSomething();
+	virtual void doSomething();
 private:
 
 };
 
-class Yoshi : public AliveActor //MainActors -> Yoshi
-{
-public:
-	Yoshi(StudentWorld* world, double startX, double startY)
-		: AliveActor(world, IID_YOSHI, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY, right) {};
-private:
-
-};
+//class Yoshi : public AliveActor //MainActors -> Yoshi
+//{
+//public:
+//	Yoshi(StudentWorld* world, double startX, double startY)
+//		: AliveActor(world, IID_YOSHI, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY, right) {};
+//private:
+//
+//};
 
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
