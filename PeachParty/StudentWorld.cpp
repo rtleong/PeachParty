@@ -1,9 +1,22 @@
 #include "StudentWorld.h"
+#include "Actor.h"
 #include "GameConstants.h"
 #include <string>
 #include <vector>
+#include "Board.h"
 using namespace std;
 
+
+bool StudentWorld::insertPeach(double x, double y) {
+    m_peach = new Peach(this, x, y);
+    actors.push_back(m_peach);
+    return true;
+}
+
+bool StudentWorld::insertBlueSquare(double x, double y) {
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, 0, 1));
+    return true;
+}
 GameWorld* createStudentWorld(string assetPath)
 {
 	return new StudentWorld(assetPath);
@@ -30,24 +43,33 @@ int StudentWorld::init()
             cerr << "Your board was improperly formatted\n";
         else if (result == Board::load_success) {
             cerr << "Successfully loaded board\n";
-            Board::GridEntry ge = bd.getContentsOf(5, 10); // x=5, y=10
-            switch (ge) {
-            case Board::empty:
-                cerr << "Location 5,10 is empty\n";
-                break;
-            case Board::boo:
-                cout << "Location 5,10 has a Boo and a blue coin square\n";
-                break;
-            case Board::bowser:
-                    cerr << "Location 5,10 has a Bowser and a blue coin square\n";
-                break;
-            case Board::player:
-                cerr << "Location 5,10 has Peach & Yoshi and a blue coin square\n";
-                break;
-            case Board::red_coin_square:
-                cerr << "Location 5,10 has a red coin square\n";
-                break;
-                // etc… //given implementation of board 
+            //Board::GridEntry ge = bd.getContentsOf(5, 10); //x=5, y=10
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    Board::GridEntry ge = bd.getContentsOf(x, y); //instead of 5, 10 get x, y
+                    switch (ge) {
+                    case Board::empty:
+                        cerr << "Location" << x << " " << y << " is empty.";
+                        break;
+                    case Board::boo:
+                        cout << "Location" << x << " " << y << " has a boo.";
+                        break;
+                    case Board::bowser:
+                        cerr << "Location" << x << " " << y << " has a bowser";
+                        break;
+                    case Board::player:
+                        cerr << "Location" << x << " " << y << " has a player Yoshi and Peach";
+                        insertPeach(x, y);
+                        break;
+                    case Board::red_coin_square:
+                        cerr << "Location" << x << " " << y << " has a red coin square";
+                        break;
+                    case Board::blue_coin_square:
+                        cerr << "Location" << x << " " << y << " has a blue coin square";
+                        insertBlueSquare(x, y);
+                        // etc… //given implementation of board 
+                    }
+                }
             }
         }
     }

@@ -97,7 +97,7 @@ class BoardActor : public Actor
 public:
 	BoardActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
 		: Actor(world, imageID, startX, startY, startDirection, depth), m_activated(true) {};
-	virtual void doSomething();
+	virtual void doSomething() = 0;
 	bool isActivated() { return m_activated; }
 	void deActivate() { m_activated = false; }
 
@@ -105,7 +105,7 @@ private:
 	bool m_activated;
 };
 
-class CoinSquare : BoardActor
+class CoinSquare : public BoardActor
 {
 public:
 	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
@@ -116,7 +116,7 @@ private:
 
 };
 
-class StarSquare : BoardActor
+class StarSquare : public BoardActor
 {
 public:
 
@@ -124,7 +124,7 @@ private:
 
 };
 
-class DirectionalSquare : BoardActor
+class DirectionalSquare : public BoardActor
 {
 public:
 
@@ -132,7 +132,7 @@ private:
 
 };
 
-class BankSquare : BoardActor
+class BankSquare : public BoardActor
 {
 public:
 
@@ -140,7 +140,7 @@ private:
 
 };
 
-class EventSquare : BoardActor
+class EventSquare : public BoardActor
 {
 public:
 
@@ -148,7 +148,7 @@ private:
 
 };
 
-class DroppingSquare : BoardActor
+class DroppingSquare : public BoardActor
 {
 public:
 

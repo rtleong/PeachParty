@@ -44,8 +44,8 @@ void Peach::doSomething() {
 	}
 	//continue with step 2 below
 	if (checkRollStatus()) { //if walking, move as spec indicates
-		if () {
-
+	//	if () {
+		{
 		}
 
 
