@@ -22,7 +22,7 @@ public:
   bool insertBlueSquare(double x, double y);
 
 private:
-
+	Board* m_board;
 	std::vector<Actor*> actors;
 	Peach* m_peach;
 };

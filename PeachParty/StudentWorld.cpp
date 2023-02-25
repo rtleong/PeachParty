@@ -9,7 +9,6 @@ using namespace std;
 
 bool StudentWorld::insertPeach(double x, double y) {
     m_peach = new Peach(this, x, y);
-    actors.push_back(m_peach);
     return true;
 }
 
