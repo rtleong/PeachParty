@@ -7,15 +7,19 @@
 using namespace std;
 
 
-bool StudentWorld::insertPeach(double x, double y) {
-    m_peach = new Peach(this, x, y);
-    return true;
-}
-
-bool StudentWorld::insertBlueSquare(double x, double y) {
-    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, 0, 1));
-    return true;
-}
+//bool StudentWorld::insertPeach(double x, double y) {
+//    if (validPos(x, y)) {
+//        m_peach = new Peach(this, x, y);
+//        return true;
+//    }
+//}
+//
+//bool StudentWorld::insertBlueSquare(double x, double y) {
+//    if (validPos(x, y)) {
+//        actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, 0, 1));
+//        return true;
+//    }
+//}
 GameWorld* createStudentWorld(string assetPath)
 {
 	return new StudentWorld(assetPath);
@@ -32,7 +36,6 @@ StudentWorld::StudentWorld(string assetPath)
 
 int StudentWorld::init()
 {
-    {
         Board bd; //given code, reads in board
         string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt";
         Board::LoadResult result = bd.loadBoard(board_file);
@@ -51,28 +54,29 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " is empty.\n";
                         break;
                     case Board::boo:
-                        cout << "Location " << x << " " << y << " has a boo.\n";
+                        cerr << "Location " << x << " " << y << " has a boo.\n";
                         break;
                     case Board::bowser:
                         cerr << "Location " << x << " " << y << " has a bowser.\n";
                         break;
                     case Board::player:
                         cerr << "Location " << x << " " << y << " has a player Yoshi and Peach\n";
-                        insertPeach(x, y);
+                        //insertPeach(x, y);
+                        m_peach = new Peach(this, x, y);
                         break;
                     case Board::red_coin_square:
                         cerr << "Location " << x << " " << y << " has a red coin square\n";
                         break;
                     case Board::blue_coin_square:
                         cerr << "Location " << x << " " << y << " has a blue coin square\n";
-                        insertBlueSquare(x, y);
+                       // insertBlueSquare(x, y);
+                        actors.push_back(new CoinSquare(this, x, y));
                         break;
                         // etc… //given implementation of board 
                     }
                 }
             }
         }
-    }
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -105,12 +109,15 @@ void StudentWorld::cleanUp()
 }
 
 bool StudentWorld::validPos(double x, double y) {
-    for (auto a : actors) {
-        if (x + SPRITE_WIDTH - 1 > a->getX() && x < a->getX() + SPRITE_WIDTH - 1) { //if x is out of bounds dont move or y is out of bounds dont move
-            if (y + SPRITE_HEIGHT - 1 > a->getY() && y < a->getY() + SPRITE_HEIGHT - 1) { // or y is out of bounds dont move
-                return false;
-            }
-        }
+    Board::GridEntry grent = m_board->getContentsOf(int(x / 16), int(y / 16));
+    if (grent == Board::GridEntry::empty) {
+        return false;
     }
-    return true;
+    //check for others
+    if ((x >= 0 && x <= VIEW_WIDTH - 1) && (y >= 0 && y <= VIEW_HEIGHT - 1)) {
+        return true;
+    }
+    else {
+        return true; //fix this
+    }
 }

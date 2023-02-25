@@ -11,7 +11,7 @@ public:
 	Actor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth) 
 		: GraphObject(imageID, startX, startY, startDirection, depth), m_world(world) {};
 	virtual void doSomething() = 0;
-	StudentWorld* getWorld() { return m_world; }
+	StudentWorld* getWorld() { return m_world; };
 
 private:
 	StudentWorld* m_world;
@@ -28,33 +28,35 @@ public:
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
 	virtual void deactivate() { activate = false; 
 							return; }
-	bool checkRollStatus() { return waitingtoroll; }
-	virtual void isWalking() { waitingtoroll = false; 
-	return; }
 private:
 	bool activate;
-	bool waitingtoroll = true;
 };
-
-//class MainActors : public AliveActor //alive actors -> main actors  (probably will never need to be deactivated)
-//{
-//public:
-//	MainActors(StudentWorld* world, double startX, double startY)
-//		: AliveActor(world, imageID, startX, startY, startDirection, depth) {};
-//private:
-//
-//};
 
 class Peach : public AliveActor //main actors ->  Peach
 {
 public:
-	Peach(StudentWorld* world, double startX, double startY)
-		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * startX, SPRITE_HEIGHT * startY, right) {};//right initializes peach with starting direction of right
+	Peach(StudentWorld* world, int boardX, int boardY)
+		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
+	bool checkRollStatus() { return waitingtoroll; }
+	virtual void isWaitingtoRoll() { waitingtoroll = true; return; }
+	virtual void isWalking() {
+		waitingtoroll = false; return;
+	}
 private:
 	void playerMove(double x, double y);
 	int die_roll;
 	int ticks_to_move;
+	bool waitingtoroll = true;
+};
+
+class CoinSquare : public AliveActor {
+public:
+	CoinSquare(StudentWorld* world, double startX, double startY)
+		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right) {};
+	void doSomething();
+private:
+
 };
 
 class Yoshi : public AliveActor //MainActors -> Yoshi
@@ -94,68 +96,68 @@ private:
 		Actors that DO NOT MOVE and are on the board
 */
 
-class BoardActor : public Actor
-{
-public:
-	BoardActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
-		: Actor(world, imageID, startX, startY, startDirection, depth), m_activated(true) {};
-	virtual void doSomething() = 0;
-	bool isActivated() { return m_activated; }
-	void deActivate() { m_activated = false; }
+//class BoardActor : public AliveActor
+//{
+//public:
+//	BoardActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
+//		: AliveActor(world, imageID, startX, startY, startDirection), m_activated(true) {};
+//	virtual void doSomething() = 0;
+//	bool isActivated() { return m_activated; }
+//	void deActivate() { m_activated = false; }
+//
+//private:
+//	bool m_activated;
+//};
+//
+//class CoinSquare : public BoardActor
+//{
+//public:
+//	CoinSquare(StudentWorld* world, double startX, double startY)
+//		: BoardActor(world, IID_BLUE_COIN_SQUARE, startX, startY, 0, 1) {};
+//	virtual void doSomething();
+//private:
+//
+//
+//};
 
-private:
-	bool m_activated;
-};
-
-class CoinSquare : public BoardActor
-{
-public:
-	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
-		: BoardActor(world, IID_BLUE_COIN_SQUARE, startX, startY, 0, 1) {};
-	virtual void doSomething();
-private:
-
-
-};
-
-class StarSquare : public BoardActor
-{
-public:
-
-private:
-
-};
-
-class DirectionalSquare : public BoardActor
-{
-public:
-
-private:
-
-};
-
-class BankSquare : public BoardActor
-{
-public:
-
-private:
-
-};
-
-class EventSquare : public BoardActor
-{
-public:
-
-private:
-
-};
-
-class DroppingSquare : public BoardActor
-{
-public:
-
-private:
-
-};
+//class StarSquare : public //BoardActor
+//{
+//public:
+//
+//private:
+//
+//};
+//
+//class DirectionalSquare : public //BoardActor
+//{
+//public:
+//
+//private:
+//
+//};
+//
+//class BankSquare : public //BoardActor
+//{
+//public:
+//
+//private:
+//
+//};
+//
+//class EventSquare : public BoardActor
+//{
+//public:
+//
+//private:
+//
+//};
+//
+//class DroppingSquare : public BoardActor
+//{
+//public:
+//
+//private:
+//
+//};
 
 #endif // ACTOR_H_

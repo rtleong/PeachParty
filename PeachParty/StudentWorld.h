@@ -18,8 +18,8 @@ public:
   virtual void cleanUp();
   ~StudentWorld();
   bool validPos(double x, double y);
-  bool insertPeach(double x, double y);
-  bool insertBlueSquare(double x, double y);
+ // bool insertPeach(double x, double y);
+  //bool insertBlueSquare(double x, double y);
 
 private:
 	Board* m_board;
