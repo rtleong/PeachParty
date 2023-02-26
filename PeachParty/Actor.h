@@ -45,7 +45,7 @@ public:
 	void startWalking() { waitingtoroll = false; }
 	int getWalking();
 private:
-	void playerMove(double x, double y);
+	void playerMove();
 	int walkingDirection;
 	int player_side = 1;
 	int ticks_to_move = 0;

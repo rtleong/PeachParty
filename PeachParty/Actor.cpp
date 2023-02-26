@@ -5,13 +5,12 @@
 
 class StudentWorld;
 
-void Peach::playerMove(double x1, double y1) {
-	if (getWorld()->validPos(x1, y1)) {
-		moveTo(x1, y1);
-	}
+void Peach::playerMove() {
+	moveAtAngle(walkingDirection, 2);
 	ticks_to_move--;
-	if (ticks_to_move == 0)
+	if (ticks_to_move == 0) {
 		waitToRoll();
+	}
 }
 
 void Peach::doSomething() {
@@ -63,10 +62,14 @@ void Peach::doSomething() {
 					setDirection(left);
 					walkingDirection = left;
 				}
+				if (walkingDirection == down) {
+					setDirection(right);
+					walkingDirection = right;
+				}
 			}
 		}
 		else {
-			moveAtAngle(walkingDirection, 2);
+			playerMove();
 			/*if (walkingDirection = right) {
 				playerMove(getX() + 2, getY());
 			}
