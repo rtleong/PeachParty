@@ -5,7 +5,7 @@
 
 class StudentWorld;
 
-void Peach::playerMove() {
+void PlayerActor::playerMove() {
 	moveAtAngle(walkingDirection, 2);
 	ticks_to_move--;
 	if (ticks_to_move == 0) {
@@ -13,7 +13,7 @@ void Peach::playerMove() {
 	}
 }
 
-void Peach::doSomething() {
+void PlayerActor::doSomething() {
 	if (checkRollStatus() == true) { //rollStatus and waitingtoroll is not working
 		
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //this is the problem
@@ -30,13 +30,10 @@ void Peach::doSomething() {
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
 			if (walkingDirection == right || walkingDirection == left) {
 				int a, b;
-				//std::cerr << "NOW here\n";
 				getPositionInThisDirection(up, 16, a, b);
 				if (getWorld()->validPos(a, b)) {
 					setDirection(right);
 					walkingDirection = up;
-					std::cerr << "NOW here\n";
-					std::cerr << "here\n";
 				}
 				else {
 					int e, f;
@@ -70,30 +67,15 @@ void Peach::doSomething() {
 		}
 		else {
 			playerMove();
-			/*if (walkingDirection = right) {
-				playerMove(getX() + 2, getY());
-			}
-			else if (walkingDirection = up) {
-				playerMove(getX(), getY() + 2);
-			}
-			else if (walkingDirection = left) {
-				playerMove(getX() - 2, getY());
-			}
-			else {
-				playerMove(getX(), getY() - 2);
-			}*/
-			/*ticks_to_move--;
-			if (ticks_to_move == 0)
-				waitToRoll();*/
 		}
 	}
 }
 
-int Peach::getPlayerNumber() {
+int PlayerActor::getPlayerNumber() {
 	return player_side;
 }
 
-int Peach::getWalking() {
+int PlayerActor::getWalking() {
 	return walkingDirection;
 }
 void CoinSquare::doSomething() {

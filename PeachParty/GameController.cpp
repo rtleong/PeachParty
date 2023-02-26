@@ -262,7 +262,7 @@ void GameController::doSomething()
 			break;
 		case welcome:
 			playSound(SOUND_THEME);
-			m_mainMessage = "Welcome to Peach Party!";
+			m_mainMessage = "Welcome to PlayerActor Party!";
             m_secondMessage = "Press 1 or 2 or ... or 9 to choose board";
 			setGameState(prompt);
 			m_nextStateAfterPrompt = init;

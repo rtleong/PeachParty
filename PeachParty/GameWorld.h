@@ -113,7 +113,7 @@ private:
 	int             m_coins;
 	int             m_boardNumber;
 	GameController* m_controller;
-	std::queue<int> m_pendingActions[2];  // 0 for Peach, 1 for Yoshi
+	std::queue<int> m_pendingActions[2];  // 0 for PlayerActor, 1 for Yoshi
 	std::string     m_assetPath;
 	std::map<int, KeyInfo> m_keyMap;
 	std::chrono::system_clock::time_point m_countdownTimerDeadline;

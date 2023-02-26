@@ -7,25 +7,12 @@
 using namespace std;
 
 
-//bool StudentWorld::insertPeach(double x, double y) {
-//    if (validPos(x, y)) {
-//        m_peach = new Peach(this, x, y);
-//        return true;
-//    }
-//}
-//
-//bool StudentWorld::insertBlueSquare(double x, double y) {
-//    if (validPos(x, y)) {
-//        actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, 0, 1));
-//        return true;
-//    }
-//}
 GameWorld* createStudentWorld(string assetPath)
 {
 	return new StudentWorld(assetPath);
 }
 
-// Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
+
 
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
@@ -39,9 +26,9 @@ StudentWorld::StudentWorld(string assetPath)
 
 int StudentWorld::init()
 {
-      //  Board bd; //given code, reads in board
+   
         startCountdownTimer(99);
-        string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt";  /*to_string(getBoardNumber()) + ".txt"*/;
+        string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt"; 
         Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
             cerr << "Could not find board01.txt data file\n";
@@ -49,10 +36,9 @@ int StudentWorld::init()
             cerr << "Your board was improperly formatted\n";
         else if (result == Board::load_success) {
             cerr << "Successfully loaded board\n";
-            //Board::GridEntry ge = bd.getContentsOf(5, 10); //x=5, y=10
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
-                    Board::GridEntry ge = m_board->getContentsOf(x, y); //instead of 5, 10 get x, y
+                    Board::GridEntry ge = m_board->getContentsOf(x, y); 
                     switch (ge) {
                     case Board::empty:
                         cerr << "Location " << x << " " << y << " is empty.\n";
@@ -64,9 +50,9 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " has a bowser.\n";
                         break;
                     case Board::player:
-                        cerr << "Location " << x << " " << y << " has a player Yoshi and Peach\n";
-                        //insertPeach(x, y);
-                        addPeach(x, y);
+                        cerr << "Location " << x << " " << y << " has a player Yoshi and PlayerActor\n";
+                        //insertPlayerActor(x, y);
+                        addPlayerActor(x, y);
                         break;
                     case Board::red_coin_square:
                         cerr << "Location " << x << " " << y << " has a red coin square\n";
@@ -86,8 +72,7 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
-    // This code is here merely to allow the game to build, run, and terminate after you hit ESC.
-    // Notice that the return value GWSTATUS_NOT_IMPLEMENTED will cause our framework to end the game.
+   
 
     m_peach->doSomething(); //tell peach to do something
     for (Actor* a : actors) { //all actors need to do there "something"
@@ -114,8 +99,8 @@ void StudentWorld::cleanUp()
     m_board = nullptr;
 }
 
-void StudentWorld::addPeach(double x, double y) {
-    m_peach = new Peach(this, x, y);
+void StudentWorld::addPlayerActor(double x, double y) {
+    m_peach = new PlayerActor(this, x, y);
     actors.push_back(new CoinSquare(this, x, y));
 }
 
@@ -143,4 +128,25 @@ bool StudentWorld::validPos(double x, double y) {
     else {
         return true; //fix this
     }
+}
+
+bool StudentWorld::intersecting(double x1, double y1, double x2, double y2) {
+    if (x1 + SPRITE_WIDTH > x2 && x1 < x2 + SPRITE_WIDTH) {
+        if (y1 + SPRITE_HEIGHT > y2 && y1 < y2 + SPRITE_HEIGHT) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool StudentWorld::intersecting(Actor* a, Actor* b) {
+    return intersecting(a->getX(), a->getY(), b->getX(), b->getY());
+}
+
+bool StudentWorld::overlap(double x1, double y1, double x2, double y2) {
+    return abs(x1 - x2) < SPRITE_WIDTH && abs(y1 - y2) < SPRITE_HEIGHT; //check if valid
+}
+
+bool StudentWorld::overlap(Actor* a, Actor* b) {
+    return overlap(a->getX(), a->getY(), b->getX(), b->getY());
 }

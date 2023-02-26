@@ -24,7 +24,7 @@ bool is_directory(string path)
 
   // If your program is having trouble finding the Assets directory,
   // replace the string literal with a full path name to the directory,
-  // e.g., "Z:/CS32/SuperPeachSisters/Assets" or "/Users/fred/cs32/SuperPeachSisters/Assets"
+  // e.g., "Z:/CS32/SuperPlayerActorSisters/Assets" or "/Users/fred/cs32/SuperPlayerActorSisters/Assets"
 
 const string assetDirectory = "Assets";
 
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
     }
 
     GameWorld* gw = createStudentWorld(assetPath);
-    Game().run(argc, argv, gw, "Peach Party");
+    Game().run(argc, argv, gw, "PlayerActor Party");
 }

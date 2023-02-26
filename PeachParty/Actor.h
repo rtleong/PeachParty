@@ -4,6 +4,24 @@
 #include "GraphObject.h"
 
 class StudentWorld;
+/*
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+			PlayerActor
+	Alive Actor
+Actor		Baddies
+			Coin Square
+	
+
+*/
+
+
+
 
 class Actor : public GraphObject
 {
@@ -18,7 +36,7 @@ private:
 };
 
 /*
-		Alive Actors that MOVE: Peach, Yoshi, Boo, Bowser
+		Alive Actors that MOVE: PlayerActor, Yoshi, Boo, Bowser
 */
 class AliveActor : public Actor //Actors -> alive actors 
 {
@@ -32,12 +50,11 @@ private:
 	bool activate;
 };
 
-class Peach : public AliveActor //main actors ->  Peach
+class PlayerActor : public AliveActor //main actors ->  PlayerActor
 {
 public:
-	Peach(StudentWorld* world, int boardX, int boardY)
-		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right, 0), 
-		waitingtoroll(true), walkingDirection(right) {};//right initializes peach with starting direction of right
+	PlayerActor(StudentWorld* world, int boardX, int boardY)
+		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right, 0), waitingtoroll(true), walkingDirection(right) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
@@ -46,8 +63,9 @@ public:
 	int getWalking();
 private:
 	void playerMove();
+	int coins = 0;
 	int walkingDirection;
-	int player_side = 1;
+	int player_side = 1; //initialize peach as 1 and yoshi as 2
 	int ticks_to_move = 0;
 	bool waitingtoroll;
 };
@@ -55,10 +73,10 @@ private:
 class CoinSquare : public AliveActor {
 public:
 	CoinSquare(StudentWorld* world, double startX, double startY)
-		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
+		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1), coins(3) {};
 	virtual void doSomething();
 private:
-
+	int coins;
 };
 
 //class Yoshi : public AliveActor //MainActors -> Yoshi
