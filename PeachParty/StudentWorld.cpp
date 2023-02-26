@@ -66,7 +66,7 @@ int StudentWorld::init()
                     case Board::player:
                         cerr << "Location " << x << " " << y << " has a player Yoshi and Peach\n";
                         //insertPeach(x, y);
-                        m_peach = new Peach(this, x, y);
+                        addPeach(x, y);
                         break;
                     case Board::red_coin_square:
                         cerr << "Location " << x << " " << y << " has a red coin square\n";
@@ -74,7 +74,7 @@ int StudentWorld::init()
                     case Board::blue_coin_square:
                         cerr << "Location " << x << " " << y << " has a blue coin square\n";
                        // insertBlueSquare(x, y);
-                        actors.push_back(new CoinSquare(this, x, y));
+                        addBlueCoinSquare(x, y);
                         break;
                         // etc… //given implementation of board 
                     }
@@ -114,9 +114,26 @@ void StudentWorld::cleanUp()
     m_board = nullptr;
 }
 
+void StudentWorld::addPeach(double x, double y) {
+    m_peach = new Peach(this, x, y);
+    actors.push_back(new CoinSquare(this, x, y));
+}
+
+void StudentWorld::addBlueCoinSquare(double x, double y) {
+    actors.push_back(new CoinSquare(this, x, y));
+}
+
+bool StudentWorld::canWalk(double x, double y) {
+    Board::GridEntry ge = m_board->getContentsOf(x + 16, y + 16);
+    if (ge == Board::GridEntry::empty) {
+        return true; //fix
+    }
+    return false; ///fix
+}
+
 bool StudentWorld::validPos(double x, double y) {
-    Board::GridEntry grent = m_board->getContentsOf(int(x / 16), int(y / 16));
-    if (grent == Board::GridEntry::empty) {
+    Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
+    if (grent == Board::GridEntry::empty()) {
         return false;
     }
     //check for others

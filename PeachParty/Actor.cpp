@@ -9,27 +9,35 @@ void Peach::playerMove(double x1, double y1) {
 	if (getWorld()->validPos(x1, y1)) {
 		moveTo(x1, y1);
 	}
+	ticks_to_move--;
+	if (ticks_to_move == 0)
+		waitToRoll();
 }
 
 void Peach::doSomething() {
-	if (rollStatus == waitingtoroll) {
-		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) {
+	if (checkRollStatus() == true) { //rollStatus and waitingtoroll is not working
+		
+		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //this is the problem
 			int die_roll = randInt(1, 10);
 			ticks_to_move = die_roll * 8;
-			rollStatus = walking;
+			startWalking();
+			
 		}
-		else return;
+	else return;
 	}
-	else if (rollStatus == walking) {
+	else if (checkRollStatus() == false) { //if Walking
 		int x, y;
-		getPositionInThisDirection(getWalking(), 16, x, y); //return side and walking direction with member variables 
+		getPositionInThisDirection(right, 16, x, y); //return side and walking direction with member variables 
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
+			std::cerr << "here\n";
 			if (walkingDirection == right || walkingDirection == left) {
 				int a, b;
-				getPositionInThisDirection(up, 16, x, y);
+				//std::cerr << "NOW here\n";
+				getPositionInThisDirection(up, 16, a, b);
 				if (getWorld()->validPos(a, b)) {
 					setDirection(right);
 					walkingDirection = up;
+					std::cerr << "NOW here\n";
 				}
 				else {
 					int e, f;
@@ -50,9 +58,23 @@ void Peach::doSomething() {
 					}
 				}
 			}
-			else {
-
+		}
+		else {
+			if (walkingDirection = right) {
+				playerMove(getX() + 2, getY());
 			}
+			else if (walkingDirection = up) {
+				playerMove(getX(), getY() + 2);
+			}
+			else if (walkingDirection = left) {
+				playerMove(getX() - 2, getY());
+			}
+			else {
+				playerMove(getX(), getY() - 2);
+			}
+			/*ticks_to_move--;
+			if (ticks_to_move == 0)
+				waitToRoll();*/
 		}
 	}
 }

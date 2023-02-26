@@ -23,8 +23,8 @@ private:
 class AliveActor : public Actor //Actors -> alive actors 
 {
 public:
-	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection)
-		: Actor(world, imageID, startX, startY, startDirection, 0), activate(true) {};
+	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
+		: Actor(world, imageID, startX, startY, startDirection, depth), activate(true) {};
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
 	virtual void deactivate() { activate = false; return; }
 	virtual void doSomething() = 0;
@@ -36,26 +36,26 @@ class Peach : public AliveActor //main actors ->  Peach
 {
 public:
 	Peach(StudentWorld* world, int boardX, int boardY)
-		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right) , waitingtoroll(true), 
-		rollStatus(waitingtoroll), player_side(0), walkingDirection(right) {};//right initializes peach with starting direction of right
+		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right, 0), 
+		waitingtoroll(true), walkingDirection(right) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
+	void waitToRoll() { waitingtoroll = true; }
+	void startWalking() { waitingtoroll = false; }
 	int getWalking();
 private:
 	void playerMove(double x, double y);
 	int walkingDirection;
-	int player_side;
+	int player_side = 1;
 	int ticks_to_move = 0;
-	bool rollStatus;
 	bool waitingtoroll;
-	bool walking = false;
 };
 
 class CoinSquare : public AliveActor {
 public:
 	CoinSquare(StudentWorld* world, double startX, double startY)
-		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right) {};
+		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
 	virtual void doSomething();
 private:
 
