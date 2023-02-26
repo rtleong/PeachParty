@@ -41,7 +41,7 @@ int StudentWorld::init()
 {
       //  Board bd; //given code, reads in board
         startCountdownTimer(99);
-        string board_file = assetPath() + "board01.txt"  /*to_string(getBoardNumber()) + ".txt"*/;
+        string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt";  /*to_string(getBoardNumber()) + ".txt"*/;
         Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
             cerr << "Could not find board01.txt data file\n";
@@ -133,14 +133,14 @@ bool StudentWorld::canWalk(double x, double y) {
 
 bool StudentWorld::validPos(double x, double y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
-    if (grent == Board::GridEntry::empty()) {
+    if (grent == Board::GridEntry::empty) {
         return false;
     }
     //check for others
-    if ((x >= 0 && x <= VIEW_WIDTH - 1) && (y >= 0 && y <= VIEW_HEIGHT - 1)) {
+    else if ((x >= 0 && x <= VIEW_WIDTH - 1) && (y >= 0 && y <= VIEW_HEIGHT - 1)) {
         return true;
     }
     else {
-        return false; //fix this
+        return true; //fix this
     }
 }

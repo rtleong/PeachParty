@@ -27,9 +27,8 @@ void Peach::doSomething() {
 	}
 	else if (checkRollStatus() == false) { //if Walking
 		int x, y;
-		getPositionInThisDirection(right, 16, x, y); //return side and walking direction with member variables 
+		getPositionInThisDirection(getWalking(), 16, x, y); //return side and walking direction with member variables 
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
-			std::cerr << "here\n";
 			if (walkingDirection == right || walkingDirection == left) {
 				int a, b;
 				//std::cerr << "NOW here\n";
@@ -38,6 +37,7 @@ void Peach::doSomething() {
 					setDirection(right);
 					walkingDirection = up;
 					std::cerr << "NOW here\n";
+					std::cerr << "here\n";
 				}
 				else {
 					int e, f;
@@ -58,9 +58,16 @@ void Peach::doSomething() {
 					}
 				}
 			}
+			else {
+				if (walkingDirection == up){
+					setDirection(left);
+					walkingDirection = left;
+				}
+			}
 		}
 		else {
-			if (walkingDirection = right) {
+			moveAtAngle(walkingDirection, 2);
+			/*if (walkingDirection = right) {
 				playerMove(getX() + 2, getY());
 			}
 			else if (walkingDirection = up) {
@@ -71,7 +78,7 @@ void Peach::doSomething() {
 			}
 			else {
 				playerMove(getX(), getY() - 2);
-			}
+			}*/
 			/*ticks_to_move--;
 			if (ticks_to_move == 0)
 				waitToRoll();*/
