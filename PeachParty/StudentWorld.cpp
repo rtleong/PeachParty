@@ -121,15 +121,15 @@ void StudentWorld::cleanUp()
 void StudentWorld::addPlayerActor(double x, double y) {
     m_peach = new PlayerActor(this,IID_PEACH, x, y, 1);
     m_yoshi = new PlayerActor(this, IID_YOSHI, x, y, 2);
-    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, ));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
 }
 
 void StudentWorld::addBlueCoinSquare(double x, double y) {
-    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
 }
 
 void StudentWorld::addRedCoinSquare(double x, double y) {
-    actors.push_back(new CoinSquare(this, IID_RED_COIN_SQUARE, x, y));
+    actors.push_back(new CoinSquare(this, IID_RED_COIN_SQUARE, x, y, false));
 }
 
 bool StudentWorld::canWalk(double x, double y) {

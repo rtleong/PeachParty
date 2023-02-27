@@ -83,6 +83,10 @@ void PlayerActor::giveCoinstoActor(int n) {
 	coins += n;
 }
 
+void PlayerActor::takeCoinsfromActor(int n) {
+	coins -= n;
+}
+
 void CoinSquare::doSomething() {
 	if (!isActivated()) {
 		return;
@@ -94,9 +98,16 @@ void CoinSquare::doSomething() {
 		if (peach_activated) {
 			return;
 		}
-		getWorld()->getPeach()->giveCoinstoActor(3);
-		getWorld()->playSound(SOUND_GIVE_COIN);
-		peach_activated = true;
+		if (giveColor() == true) {
+			getWorld()->getPeach()->giveCoinstoActor(3);
+			getWorld()->playSound(SOUND_GIVE_COIN);
+			peach_activated = true;
+		}
+		if (giveColor() == false) {
+			getWorld()->getPeach()->takeCoinsfromActor(3);
+			getWorld()->playSound(SOUND_TAKE_COIN);
+			peach_activated = true;
+		}
 	}
 	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())) || getWorld()->getYoshi()->checkRollStatus() == false) {
 		yoshi_activated = false;
@@ -105,8 +116,15 @@ void CoinSquare::doSomething() {
 		if (yoshi_activated) {
 			return;
 		}
-		getWorld()->getYoshi()->giveCoinstoActor(3);
-		getWorld()->playSound(SOUND_GIVE_COIN);
-		yoshi_activated = true;
+		if (giveColor() == true) {
+			getWorld()->getYoshi()->giveCoinstoActor(3);
+			getWorld()->playSound(SOUND_GIVE_COIN);
+			yoshi_activated = true;
+		}
+		if (giveColor() == false) {
+			getWorld()->getYoshi()->takeCoinsfromActor(3);
+			getWorld()->playSound(SOUND_TAKE_COIN);
+			yoshi_activated = true;
+		}
 	}
 }

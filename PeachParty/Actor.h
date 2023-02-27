@@ -55,10 +55,11 @@ class PlayerActor : public AliveActor //main actors ->  PlayerActor
 {
 public:
 	PlayerActor(StudentWorld* world, int imageID, int boardX, int boardY, int playerNumber)
-		: AliveActor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber) {}; // m_num(playerNumber) {};//right initializes peach with starting direction of right
+		: AliveActor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber)
+	, coins(0), stars(0) {}; // m_num(playerNumber) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
 	//accessors
-
+	int checkCoins() { return coins; }
 	//movement
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
@@ -68,9 +69,11 @@ public:
 
 	//giving stuff
 	void giveCoinstoActor(int n);
+	void takeCoinsfromActor(int n);
 private:
 	void playerMove();
-	int coins = 0;
+	int stars;
+	int coins;
 	int walkingDirection;
 	int m_num; // initialize peach as 1 and yoshi as 2
 	int ticks_to_move = 0;
@@ -80,34 +83,24 @@ private:
 class CoinSquare : public AliveActor {
 public:
 	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, bool color) //activate is false when initialized
-		: AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1), coins(3) {};
+		: AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1),
+		colorOfSquare(color) {};
 	virtual void doSomething();
+	bool giveColor() { return colorOfSquare; }
 private:
-	int coins;
-	bool isRed = false;
-	bool isBlue = true;
+	bool colorOfSquare;
 	bool peach_activated;
 	bool yoshi_activated;
 };
 
-//class BlueCoinSquare : public CoinSquare {
-//public:
-//	BlueCoinSquare(StudentWorld* world, int imageID, double startX, double startY)
-//		: CoinSquare(world, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * startX, SPRITE_HEIGHT * startY) {};
-//	virtual void doSomething();
-//private:
-//	bool peach_activated;
-//	bool yoshi_activated;
-//};
-//
-//class RedCoinSquare : public CoinSquare {
-//public:
-//	RedCoinSquare(StudentWorld* world, double startX, double startY)
-//		: CoinSquare(world, IID_RED_COIN_SQUARE, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY) {}
-//	virtual void doSomething();
-//private:
-//
-//};
+class StarSquare : public AliveActor {
+public:
+	StarSquare(StudentWorld* world, int imageID, double startX, double startY, int startDirectionn, int depth) :
+		AliveActor(world, IID_STAR_SQUARE, startX, startY, right, 1) {};
+	void doSomething();
+private:
+
+};
 
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
