@@ -74,6 +74,7 @@ public:
 	void giveCoinstoActor(int n);
 	void takeCoinsfromActor(int n);
 	void giveStar();
+	void takeStar();
 private:
 	void playerMove();
 	int stars;
@@ -122,6 +123,26 @@ class BankSquare : public AliveActor {
 public:
 	BankSquare(StudentWorld* world, double startX, double startY) :
 		AliveActor(world, IID_BANK_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	void doSomething();
+private:
+	bool peach_activated;
+	bool yoshi_activated;
+};
+
+class EventSquare : public AliveActor {
+public:
+	EventSquare(StudentWorld* world, double startX, double startY) 
+		: AliveActor(world, IID_EVENT_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	void doSomething();
+private:
+	bool peach_activated;
+	bool yoshi_activated;
+};
+
+class DroppingSquare : public AliveActor {
+public:
+	DroppingSquare(StudentWorld* world, double startX, double startY) //have to have bowser activate or something? Bowser passes in x and y?
+		: AliveActor(world, IID_DROPPING_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
 	bool peach_activated;

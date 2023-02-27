@@ -117,6 +117,10 @@ void PlayerActor::giveStar() {
 	stars++;
 }
 
+void PlayerActor::takeStar() {
+	stars--;
+}
+
 void CoinSquare::doSomething() {
 	if (!isActivated()) { //if not activated bc of bowser return
 		return;
@@ -264,7 +268,7 @@ void BankSquare::doSomething() {
 		if (getWorld()->getPeach()->checkCoins() >= 5) {
 			getWorld()->getPeach()->takeCoinsfromActor(5);
 			getWorld()->addCoinstoBank(5);
-			getWorld()->playSound(SOUND_DEPOSIT_BANK);
+			getWorld()->playSound(SOUND_DEPOSIT_BANK);	
 		}
 		else {
 			getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
@@ -296,7 +300,94 @@ void BankSquare::doSomething() {
 			getWorld()->playSound(SOUND_DEPOSIT_BANK);
 		}
 	}
-	
 }
+
+void EventSquare::doSomething() {
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
+		peach_activated = false;
+	}
+	if (peach_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+		int x;
+		x = randInt(1, 3);
+		if (x == 1) {
+			//teleport somehow
+		}
+		if (x == 2) {
+			//getWorld()->getPeach()-
+		}
+		if (x == 3) {
+
+		}
+	}
+}
+
+void DroppingSquare::doSomething() { //havent tested dropping square check when we finally do bowser...
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
+		peach_activated = false;
+	}
+	if (peach_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+		int r;
+		r = randInt(1, 2);
+		if (r == 1) {
+			if (getWorld()->getPeach()->checkCoins() >= 10) {
+				getWorld()->getPeach()->takeCoinsfromActor(10);
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				peach_activated = true;
+			}
+			if (peach_activated = true) return; //if 1st condition is true dont keep taking coins until 0
+
+			if (getWorld()->getPeach()->checkCoins() < 10) {
+				getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				peach_activated = true;
+			}
+		}
+		if (r == 2) {
+			if (getWorld()->getPeach()->checkStars() >= 1) {
+				getWorld()->getPeach()->takeStar();
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				peach_activated = true;
+			}
+		}
+	}
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting bank square not active 
+		yoshi_activated = false;
+	}
+	if (yoshi_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
+		int j;
+		j = randInt(1, 2);
+		if (j == 1) {
+			if (getWorld()->getYoshi()->checkCoins() >= 10) {
+				getWorld()->getYoshi()->takeCoinsfromActor(10);
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				yoshi_activated = true;
+			}
+			if (yoshi_activated = true) return; //if 1st condition is true dont keep taking coins until 0
+
+			if (getWorld()->getYoshi()->checkCoins() < 10) {
+				getWorld()->getYoshi()->takeCoinsfromActor(getWorld()->getYoshi()->checkCoins());
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				yoshi_activated = true;
+			}
+		}
+		if (j == 2) {
+			if (getWorld()->getYoshi()->checkStars() >= 1) {
+				getWorld()->getYoshi()->takeStar();
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+				yoshi_activated = true;
+			}
+		}
+	}
+}
+
 
 

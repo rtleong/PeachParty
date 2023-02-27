@@ -66,6 +66,7 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " has a star square\n";
                         break;
                     case Board::event_square:
+                        addEventSquare(x, y);
                         cerr << "Location " << x << " " << y << " has a event square\n";
                         break;
                     case Board::bank_square:
@@ -155,6 +156,10 @@ void StudentWorld::addBankSquare(double x, double y) {
     actors.push_back(new BankSquare(this, x, y));
 }
 
+void StudentWorld::addEventSquare(double x, double y) {
+    actors.push_back(new EventSquare(this, x, y));
+}
+
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }
@@ -173,6 +178,13 @@ void StudentWorld::addCoinstoBank(int n) {
 
 void StudentWorld::setBankBalanceToZero() {
     m_bankCoins = 0;
+}
+
+void StudentWorld::teleportRandomSquare() {
+    int x, y;
+    x = randInt(0, 15);
+    y = randInt(0, 15);
+    
 }
 
 bool StudentWorld::validPos(double x, double y) {

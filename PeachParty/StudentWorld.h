@@ -30,6 +30,8 @@ public:
   void addStarSquare(double x, double y);
   void addDirectionalSquare(double x, double y, int direction);
   void addBankSquare(double x, double y);
+  void addEventSquare(double x, double y);
+  void teleportRandomSquare();
 
   //accessors
   int getBankCoins();
