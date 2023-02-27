@@ -57,9 +57,11 @@ public:
 	PlayerActor(StudentWorld* world, int imageID, int boardX, int boardY, int playerNumber)
 		: AliveActor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber)
 	, coins(0), stars(0) {}; // m_num(playerNumber) {};//right initializes peach with starting direction of right
+
 	virtual void doSomething();
 	//accessors
 	int checkCoins() { return coins; }
+	int checkStars() { return stars; }
 	//movement
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
@@ -70,6 +72,7 @@ public:
 	//giving stuff
 	void giveCoinstoActor(int n);
 	void takeCoinsfromActor(int n);
+	void giveStar();
 private:
 	void playerMove();
 	int stars;
@@ -95,11 +98,12 @@ private:
 
 class StarSquare : public AliveActor {
 public:
-	StarSquare(StudentWorld* world, int imageID, double startX, double startY, int startDirectionn, int depth) :
-		AliveActor(world, IID_STAR_SQUARE, startX, startY, right, 1) {};
+	StarSquare(StudentWorld* world, double startX, double startY) :
+		AliveActor(world, IID_STAR_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
-
+	bool peach_activated;
+	bool yoshi_activated;
 };
 
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies

@@ -87,6 +87,10 @@ void PlayerActor::takeCoinsfromActor(int n) {
 	coins -= n;
 }
 
+void PlayerActor::giveStar() {
+	stars++;
+}
+
 void CoinSquare::doSomething() {
 	if (!isActivated()) {
 		return;
@@ -101,6 +105,7 @@ void CoinSquare::doSomething() {
 		if (giveColor() == true) {
 			getWorld()->getPeach()->giveCoinstoActor(3);
 			getWorld()->playSound(SOUND_GIVE_COIN);
+			std::cerr << getWorld()->getPeach()->checkCoins();
 			peach_activated = true;
 		}
 		if (giveColor() == false) {
@@ -128,3 +133,49 @@ void CoinSquare::doSomething() {
 		}
 	}
 }
+
+void StarSquare::doSomething() {
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) {
+		peach_activated = false;
+	}
+	if (peach_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getPeach())) {
+		peach_activated = true;
+		if (getWorld()->getPeach()->checkRollStatus() == false || getWorld()->getPeach()->checkRollStatus() == true){
+			if (getWorld()->getPeach()->checkCoins() < 20) {
+				return;
+			}
+			else {
+				getWorld()->getPeach()->takeCoinsfromActor(20);
+				getWorld()->getPeach()->giveStar();
+				getWorld()->playSound(SOUND_GIVE_STAR);
+				std::cerr << getWorld()->getPeach()->checkStars();
+				//peach_activated = true;
+			}
+		}
+	}
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) {
+		yoshi_activated = false;
+	}
+	if (yoshi_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getYoshi())) {
+		yoshi_activated = true;
+		if (getWorld()->getYoshi()->checkRollStatus() == false || getWorld()->getYoshi()->checkRollStatus() == true) {
+			if (getWorld()->getYoshi()->checkCoins() < 20) {
+				return;
+			}
+			else {
+				getWorld()->getYoshi()->takeCoinsfromActor(20);
+				getWorld()->getYoshi()->giveStar();
+				getWorld()->playSound(SOUND_GIVE_STAR);
+				std::cerr << getWorld()->getYoshi()->checkStars();
+				//peach_activated = true;
+			}
+		}
+	}
+}
+

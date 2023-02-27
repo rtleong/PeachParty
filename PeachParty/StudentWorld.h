@@ -27,7 +27,7 @@ public:
   void addPlayerActor(double x, double y);
   void addBlueCoinSquare(double x, double y);
   void addRedCoinSquare(double x, double y);
-
+  void addStarSquare(double x, double y);
 
   //giving objects
   

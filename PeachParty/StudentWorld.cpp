@@ -51,7 +51,6 @@ int StudentWorld::init()
                         break;
                     case Board::player:
                         cerr << "Location " << x << " " << y << " has a player Yoshi and PlayerActor\n";
-                        //insertPlayerActor(x, y);
                         addPlayerActor(x, y);
                         break;
                     case Board::red_coin_square:
@@ -60,10 +59,11 @@ int StudentWorld::init()
                         break;
                     case Board::blue_coin_square:
                         cerr << "Location " << x << " " << y << " has a blue coin square\n";
-                       // insertBlueSquare(x, y);
                         addBlueCoinSquare(x, y);
                         break;
                     case Board::star_square:
+                        addStarSquare(x, y);
+                        cerr << "Location " << x << " " << y << " has a star square\n";
                         break;
                     case Board::event_square:
                         break;
@@ -130,6 +130,10 @@ void StudentWorld::addBlueCoinSquare(double x, double y) {
 
 void StudentWorld::addRedCoinSquare(double x, double y) {
     actors.push_back(new CoinSquare(this, IID_RED_COIN_SQUARE, x, y, false));
+}
+
+void StudentWorld::addStarSquare(double x, double y) {
+    actors.push_back(new StarSquare(this, x, y));
 }
 
 bool StudentWorld::canWalk(double x, double y) {
