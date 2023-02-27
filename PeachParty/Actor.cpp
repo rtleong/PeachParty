@@ -15,8 +15,7 @@ void PlayerActor::playerMove() {
 
 void PlayerActor::doSomething() {
 	if (checkRollStatus() == true) { //rollStatus and waitingtoroll is not working
-		
-		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //this is the problem
+		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //this is the problem fix hardcoded 1
 			int die_roll = randInt(1, 10);
 			ticks_to_move = die_roll * 8;
 			startWalking();
@@ -25,6 +24,7 @@ void PlayerActor::doSomething() {
 	else return;
 	}
 	else if (checkRollStatus() == false) { //if Walking
+		
 		int x, y;
 		getPositionInThisDirection(getWalking(), 16, x, y); //return side and walking direction with member variables 
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -72,17 +72,41 @@ void PlayerActor::doSomething() {
 }
 
 int PlayerActor::getPlayerNumber() {
-	return player_side;
+	return m_num;
 }
 
 int PlayerActor::getWalking() {
 	return walkingDirection;
 }
+
+void PlayerActor::giveCoinstoActor(int n) {
+	coins += n;
+}
+
 void CoinSquare::doSomething() {
 	if (!isActivated()) {
 		return;
 	}
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach())) || getWorld()->getPeach()->checkRollStatus() == false) {//if peach is walking dont activate, does false work?
+		peach_activated = false;
+	}
 	else {
-
+		if (peach_activated) {
+			return;
+		}
+		getWorld()->getPeach()->giveCoinstoActor(3);
+		getWorld()->playSound(SOUND_GIVE_COIN);
+		peach_activated = true;
+	}
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())) || getWorld()->getYoshi()->checkRollStatus() == false) {
+		yoshi_activated = false;
+	}
+	else {
+		if (yoshi_activated) {
+			return;
+		}
+		getWorld()->getYoshi()->giveCoinstoActor(3);
+		getWorld()->playSound(SOUND_GIVE_COIN);
+		yoshi_activated = true;
 	}
 }

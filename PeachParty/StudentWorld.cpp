@@ -19,7 +19,7 @@ StudentWorld::StudentWorld(string assetPath)
 {   
     actors.clear(); //clear all actors
     m_board = new Board(); //update m_board to point at board
-
+    m_yoshi = nullptr;
     m_peach = nullptr; //set the peach pointer to nullptr, she can be seperate from all actors
     
 }
@@ -56,13 +56,27 @@ int StudentWorld::init()
                         break;
                     case Board::red_coin_square:
                         cerr << "Location " << x << " " << y << " has a red coin square\n";
+                        addRedCoinSquare(x, y);
                         break;
                     case Board::blue_coin_square:
                         cerr << "Location " << x << " " << y << " has a blue coin square\n";
                        // insertBlueSquare(x, y);
                         addBlueCoinSquare(x, y);
                         break;
-                        // etc… //given implementation of board 
+                    case Board::star_square:
+                        break;
+                    case Board::event_square:
+                        break;
+                    case Board::bank_square:
+                        break;
+                    case Board::up_dir_square:
+                        break;
+                    case Board::left_dir_square:
+                        break;
+                    case Board::right_dir_square:
+                        break;
+                    case Board::down_dir_square:
+                        break;
                     }
                 }
             }
@@ -72,9 +86,11 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
-   
-
+    if (timeRemaining() < 0) {
+        return GWSTATUS_PEACH_WON; //fix this if peach wins, do this else return yoshi wins, else return tie
+    }
     m_peach->doSomething(); //tell peach to do something
+    m_yoshi->doSomething();
     for (Actor* a : actors) { //all actors need to do there "something"
         a->doSomething();
     }
@@ -92,6 +108,9 @@ void StudentWorld::cleanUp()
     }
     actors.clear(); //clear the vector
 
+    delete m_yoshi;//delete yoshi
+    m_yoshi = nullptr;
+
     delete m_peach; //delete peach
     m_peach = nullptr; //declare m_peach to nullptr so we crash if follow it ever
 
@@ -100,12 +119,17 @@ void StudentWorld::cleanUp()
 }
 
 void StudentWorld::addPlayerActor(double x, double y) {
-    m_peach = new PlayerActor(this, x, y);
-    actors.push_back(new CoinSquare(this, x, y));
+    m_peach = new PlayerActor(this,IID_PEACH, x, y, 1);
+    m_yoshi = new PlayerActor(this, IID_YOSHI, x, y, 2);
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, ));
 }
 
 void StudentWorld::addBlueCoinSquare(double x, double y) {
-    actors.push_back(new CoinSquare(this, x, y));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y));
+}
+
+void StudentWorld::addRedCoinSquare(double x, double y) {
+    actors.push_back(new CoinSquare(this, IID_RED_COIN_SQUARE, x, y));
 }
 
 bool StudentWorld::canWalk(double x, double y) {
@@ -115,6 +139,15 @@ bool StudentWorld::canWalk(double x, double y) {
     }
     return false; ///fix
 }
+
+PlayerActor* StudentWorld::getPeach() {
+    return m_peach;
+}
+
+PlayerActor* StudentWorld::getYoshi() {
+    return m_yoshi;
+}
+
 
 bool StudentWorld::validPos(double x, double y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));

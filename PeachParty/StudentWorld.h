@@ -19,18 +19,30 @@ public:
   ~StudentWorld();
   bool validPos(double x, double y);
   bool canWalk(double x, double y);
+
+  PlayerActor* getPeach();
+  PlayerActor* getYoshi();
+
+  //addding objects 
   void addPlayerActor(double x, double y);
   void addBlueCoinSquare(double x, double y);
+  void addRedCoinSquare(double x, double y);
+
+
+  //giving objects
+  
+
+  bool intersecting(double x1, double y1, double x2, double y2);
+  bool intersecting(Actor* a, Actor* b);
+  bool overlap(double x1, double y1, double x2, double y2);
+  bool overlap(Actor* a, Actor* b);
 
 private:
 
-	bool intersecting(double x1, double y1, double x2, double y2);
-	bool intersecting(Actor* a, Actor* b);
-	bool overlap(double x1, double y1, double x2, double y2);
-	bool overlap(Actor* a, Actor* b);
 	Board* m_board;
 	std::vector<Actor*> actors;
 	PlayerActor* m_peach;
+	PlayerActor* m_yoshi;
 };
 
 #endif // STUDENTWORLD_H_

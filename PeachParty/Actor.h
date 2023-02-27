@@ -41,10 +41,11 @@ private:
 class AliveActor : public Actor //Actors -> alive actors 
 {
 public:
-	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
-		: Actor(world, imageID, startX, startY, startDirection, depth), activate(true) {};
+	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth) //took out imageID after world
+		: Actor(world, imageID, startX, startY, startDirection, depth), activate(true) {}; //and here too
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
-	virtual void deactivate() { activate = false; return; }
+	virtual void reActivate() { activate = true; }
+	virtual void deactivate() { activate = false; }
 	virtual void doSomething() = 0;
 private:
 	bool activate;
@@ -53,37 +54,57 @@ private:
 class PlayerActor : public AliveActor //main actors ->  PlayerActor
 {
 public:
-	PlayerActor(StudentWorld* world, int boardX, int boardY)
-		: AliveActor(world, IID_PEACH, SPRITE_WIDTH * boardX, SPRITE_HEIGHT * boardY, right, 0), waitingtoroll(true), walkingDirection(right) {};//right initializes peach with starting direction of right
+	PlayerActor(StudentWorld* world, int imageID, int boardX, int boardY, int playerNumber)
+		: AliveActor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber) {}; // m_num(playerNumber) {};//right initializes peach with starting direction of right
 	virtual void doSomething();
+	//accessors
+
+	//movement
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
 	void waitToRoll() { waitingtoroll = true; }
 	void startWalking() { waitingtoroll = false; }
 	int getWalking();
+
+	//giving stuff
+	void giveCoinstoActor(int n);
 private:
 	void playerMove();
 	int coins = 0;
 	int walkingDirection;
-	int player_side = 1; //initialize peach as 1 and yoshi as 2
+	int m_num; // initialize peach as 1 and yoshi as 2
 	int ticks_to_move = 0;
 	bool waitingtoroll;
 };
 
 class CoinSquare : public AliveActor {
 public:
-	CoinSquare(StudentWorld* world, double startX, double startY)
-		: AliveActor(world, IID_BLUE_COIN_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1), coins(3) {};
+	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, bool color) //activate is false when initialized
+		: AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1), coins(3) {};
 	virtual void doSomething();
 private:
 	int coins;
+	bool isRed = false;
+	bool isBlue = true;
+	bool peach_activated;
+	bool yoshi_activated;
 };
 
-//class Yoshi : public AliveActor //MainActors -> Yoshi
-//{
+//class BlueCoinSquare : public CoinSquare {
 //public:
-//	Yoshi(StudentWorld* world, double startX, double startY)
-//		: AliveActor(world, IID_YOSHI, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY, right) {};
+//	BlueCoinSquare(StudentWorld* world, int imageID, double startX, double startY)
+//		: CoinSquare(world, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * startX, SPRITE_HEIGHT * startY) {};
+//	virtual void doSomething();
+//private:
+//	bool peach_activated;
+//	bool yoshi_activated;
+//};
+//
+//class RedCoinSquare : public CoinSquare {
+//public:
+//	RedCoinSquare(StudentWorld* world, double startX, double startY)
+//		: CoinSquare(world, IID_RED_COIN_SQUARE, SPRITE_WIDTH* startX, SPRITE_HEIGHT* startY) {}
+//	virtual void doSomething();
 //private:
 //
 //};
