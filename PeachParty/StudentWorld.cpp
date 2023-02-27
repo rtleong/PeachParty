@@ -19,7 +19,7 @@ StudentWorld::StudentWorld(string assetPath)
 {   
     actors.clear(); //clear all actors
     m_board = new Board(); //update m_board to point at board
-    m_yoshi = nullptr;
+    m_yoshi = nullptr; //set yoshi to nullptr
     m_peach = nullptr; //set the peach pointer to nullptr, she can be seperate from all actors
     
 }
@@ -27,7 +27,7 @@ StudentWorld::StudentWorld(string assetPath)
 int StudentWorld::init()
 {
    
-        startCountdownTimer(99);
+        startCountdownTimer(99); //start countdown
         string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt"; 
         Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
@@ -36,7 +36,7 @@ int StudentWorld::init()
             cerr << "Your board was improperly formatted\n";
         else if (result == Board::load_success) {
             cerr << "Successfully loaded board\n";
-            for (int x = 0; x < 16; x++) {
+            for (int x = 0; x < 16; x++) { //loop through all board contents to load in types of objects
                 for (int y = 0; y < 16; y++) {
                     Board::GridEntry ge = m_board->getContentsOf(x, y); 
                     switch (ge) {
@@ -66,16 +66,26 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " has a star square\n";
                         break;
                     case Board::event_square:
+                        cerr << "Location " << x << " " << y << " has a event square\n";
                         break;
                     case Board::bank_square:
+                        cerr << "Location " << x << " " << y << " has a bank square\n";
                         break;
                     case Board::up_dir_square:
+                        addDirectionalSquare(x, y, 90);
+                        cerr << "Location " << x << " " << y << " has a up directional square\n";
                         break;
                     case Board::left_dir_square:
+                        addDirectionalSquare(x, y, 180);
+                        cerr << "Location " << x << " " << y << " has a left directional square\n";
                         break;
                     case Board::right_dir_square:
+                        addDirectionalSquare(x, y, 0);
+                        cerr << "Location " << x << " " << y << " has a right directional square\n";
                         break;
                     case Board::down_dir_square:
+                        addDirectionalSquare(x, y, 270);
+                        cerr << "Location " << x << " " << y << " has a down directional square\n";
                         break;
                     }
                 }
@@ -90,7 +100,7 @@ int StudentWorld::move()
         return GWSTATUS_PEACH_WON; //fix this if peach wins, do this else return yoshi wins, else return tie
     }
     m_peach->doSomething(); //tell peach to do something
-    m_yoshi->doSomething();
+    m_yoshi->doSomething(); //tell yoshi to do something
     for (Actor* a : actors) { //all actors need to do there "something"
         a->doSomething();
     }
@@ -114,18 +124,18 @@ void StudentWorld::cleanUp()
     delete m_peach; //delete peach
     m_peach = nullptr; //declare m_peach to nullptr so we crash if follow it ever
 
-    delete m_board;
+    delete m_board; //delete board pointer
     m_board = nullptr;
 }
 
 void StudentWorld::addPlayerActor(double x, double y) {
-    m_peach = new PlayerActor(this,IID_PEACH, x, y, 1);
-    m_yoshi = new PlayerActor(this, IID_YOSHI, x, y, 2);
-    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
+    m_peach = new PlayerActor(this,IID_PEACH, x, y, 1); //add peach
+    m_yoshi = new PlayerActor(this, IID_YOSHI, x, y, 2); //add yoshi
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true)); //add blue square under both Actors
 }
 
 void StudentWorld::addBlueCoinSquare(double x, double y) {
-    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true)); 
 }
 
 void StudentWorld::addRedCoinSquare(double x, double y) {
@@ -136,54 +146,50 @@ void StudentWorld::addStarSquare(double x, double y) {
     actors.push_back(new StarSquare(this, x, y));
 }
 
-bool StudentWorld::canWalk(double x, double y) {
-    Board::GridEntry ge = m_board->getContentsOf(x + 16, y + 16);
-    if (ge == Board::GridEntry::empty) {
-        return true; //fix
-    }
-    return false; ///fix
+void StudentWorld::addDirectionalSquare(double x, double y, int direction) {
+    actors.push_back(new DirectionalSquare(this, x, y, direction));
 }
 
-PlayerActor* StudentWorld::getPeach() {
+PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }
 
-PlayerActor* StudentWorld::getYoshi() {
+PlayerActor* StudentWorld::getYoshi() { //returns yoshi pointer for functions
     return m_yoshi;
 }
 
 
 bool StudentWorld::validPos(double x, double y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
-    if (grent == Board::GridEntry::empty) {
-        return false;
+    if (grent == Board::GridEntry::empty) { //if next position on board is empty
+        return false;   //only passing in x+16, y, or x, y-16, or other 4 directions
     }
     //check for others
     else if ((x >= 0 && x <= VIEW_WIDTH - 1) && (y >= 0 && y <= VIEW_HEIGHT - 1)) {
-        return true;
+        return true; //if outside of screen retun false
     }
     else {
-        return true; //fix this
+        return true; //check this if moving invalidly
     }
 }
 
 bool StudentWorld::intersecting(double x1, double y1, double x2, double y2) {
-    if (x1 + SPRITE_WIDTH > x2 && x1 < x2 + SPRITE_WIDTH) {
+    if (x1 + SPRITE_WIDTH > x2 && x1 < x2 + SPRITE_WIDTH) { //if any part of sprite X1 hits sprite x2
         if (y1 + SPRITE_HEIGHT > y2 && y1 < y2 + SPRITE_HEIGHT) {
-            return true;
+            return true; //and y is equal return true
         }
     }
     return false;
 }
 
-bool StudentWorld::intersecting(Actor* a, Actor* b) {
+bool StudentWorld::intersecting(Actor* a, Actor* b) { //input two actors to get intersecting
     return intersecting(a->getX(), a->getY(), b->getX(), b->getY());
 }
 
-bool StudentWorld::overlap(double x1, double y1, double x2, double y2) {
+bool StudentWorld::overlap(double x1, double y1, double x2, double y2) { //if fully overalapped
     return abs(x1 - x2) < SPRITE_WIDTH && abs(y1 - y2) < SPRITE_HEIGHT; //check if valid
 }
 
-bool StudentWorld::overlap(Actor* a, Actor* b) {
+bool StudentWorld::overlap(Actor* a, Actor* b) { //two actors to get overlapped
     return overlap(a->getX(), a->getY(), b->getX(), b->getY());
 }

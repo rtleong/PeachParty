@@ -6,7 +6,7 @@
 class StudentWorld;
 
 void PlayerActor::playerMove() {
-	moveAtAngle(walkingDirection, 2);
+	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
 	if (ticks_to_move == 0) {
 		waitToRoll();
@@ -14,9 +14,9 @@ void PlayerActor::playerMove() {
 }
 
 void PlayerActor::doSomething() {
-	if (checkRollStatus() == true) { //rollStatus and waitingtoroll is not working
-		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //this is the problem fix hardcoded 1
-			int die_roll = randInt(1, 10);
+	if (checkRollStatus() == true) { //if waiting to roll
+		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //and tab is hit
+			int die_roll = randInt(1, 10); //walk a random number of steps
 			ticks_to_move = die_roll * 8;
 			startWalking();
 			
@@ -26,47 +26,47 @@ void PlayerActor::doSomething() {
 	else if (checkRollStatus() == false) { //if Walking
 		
 		int x, y;
-		getPositionInThisDirection(getWalking(), 16, x, y); //return side and walking direction with member variables 
+		getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
 			if (walkingDirection == right || walkingDirection == left) {
 				int a, b;
-				getPositionInThisDirection(up, 16, a, b);
+				getPositionInThisDirection(up, 16, a, b); //check 90* for validity
 				if (getWorld()->validPos(a, b)) {
 					setDirection(right);
-					walkingDirection = up;
+					walkingDirection = up; //change direction to move up
 				}
 				else {
 					int e, f;
-					getPositionInThisDirection(down, 16, e, f);
+					getPositionInThisDirection(down, 16, e, f); //check 270* for validity
 					if (getWorld()->validPos(e, f)) {
 						setDirection(right);
 						walkingDirection = down;
 					}
 					else {
-						if (walkingDirection == right) {
+						if (walkingDirection == right) { //if only way is left, go left
 							setDirection(left);
 							walkingDirection = left;
 						}
 						else {
-							setDirection(right);
+							setDirection(right); //if going down and hit bottom, go right
 							walkingDirection = right;
 						}
 					}
 				}
 			}
 			else {
-				if (walkingDirection == up){
+				if (walkingDirection == up){ //if going up and hit top, go left
 					setDirection(left);
 					walkingDirection = left;
 				}
-				if (walkingDirection == down) {
+				if (walkingDirection == down) { //if walking down go right
 					setDirection(right);
 					walkingDirection = right;
 				}
 			}
 		}
 		else {
-			playerMove();
+			playerMove(); //move if all positions are valid
 		}
 	}
 }
@@ -92,41 +92,41 @@ void PlayerActor::giveStar() {
 }
 
 void CoinSquare::doSomething() {
-	if (!isActivated()) {
+	if (!isActivated()) { //if not activated bc of bowser return
 		return;
 	}
-	if (!(getWorld()->intersecting(this, getWorld()->getPeach())) || getWorld()->getPeach()->checkRollStatus() == false) {//if peach is walking dont activate, does false work?
-		peach_activated = false;
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach())) || getWorld()->getPeach()->checkRollStatus() == false) {
+		peach_activated = false;//if peach is walking dont activate
 	}
 	else {
 		if (peach_activated) {
 			return;
 		}
-		if (giveColor() == true) {
+		if (giveColor() == true) { //if color is blue add coins
 			getWorld()->getPeach()->giveCoinstoActor(3);
 			getWorld()->playSound(SOUND_GIVE_COIN);
-			std::cerr << getWorld()->getPeach()->checkCoins();
+			//std::cerr << getWorld()->getPeach()->checkCoins();
 			peach_activated = true;
 		}
-		if (giveColor() == false) {
+		if (giveColor() == false) { //if color is red subtract coins
 			getWorld()->getPeach()->takeCoinsfromActor(3);
 			getWorld()->playSound(SOUND_TAKE_COIN);
 			peach_activated = true;
 		}
 	}
 	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())) || getWorld()->getYoshi()->checkRollStatus() == false) {
-		yoshi_activated = false;
+		yoshi_activated = false; //set yoshi to not activate squares if walking
 	}
 	else {
 		if (yoshi_activated) {
 			return;
 		}
-		if (giveColor() == true) {
+		if (giveColor() == true) { //if square is blue give yoshi 3 coins
 			getWorld()->getYoshi()->giveCoinstoActor(3);
 			getWorld()->playSound(SOUND_GIVE_COIN);
 			yoshi_activated = true;
 		}
-		if (giveColor() == false) {
+		if (giveColor() == false) {//if square is red take away 3 coins
 			getWorld()->getYoshi()->takeCoinsfromActor(3);
 			getWorld()->playSound(SOUND_TAKE_COIN);
 			yoshi_activated = true;
@@ -135,47 +135,63 @@ void CoinSquare::doSomething() {
 }
 
 void StarSquare::doSomething() {
-	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) {
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting star square not active 
 		peach_activated = false;
 	}
 	if (peach_activated) {
 		return;
 	}
-	if (getWorld()->intersecting(this, getWorld()->getPeach())) {
+	if (getWorld()->intersecting(this, getWorld()->getPeach())) { //if intersecting star square
 		peach_activated = true;
 		if (getWorld()->getPeach()->checkRollStatus() == false || getWorld()->getPeach()->checkRollStatus() == true){
-			if (getWorld()->getPeach()->checkCoins() < 20) {
+			if (getWorld()->getPeach()->checkCoins() < 20) { //running over or landing on give star
 				return;
 			}
 			else {
-				getWorld()->getPeach()->takeCoinsfromActor(20);
+				getWorld()->getPeach()->takeCoinsfromActor(20); //take coins and give star
 				getWorld()->getPeach()->giveStar();
 				getWorld()->playSound(SOUND_GIVE_STAR);
-				std::cerr << getWorld()->getPeach()->checkStars();
+				//std::cerr << getWorld()->getPeach()->checkStars();
 				//peach_activated = true;
 			}
 		}
 	}
-	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) {
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting set false
 		yoshi_activated = false;
 	}
-	if (yoshi_activated) {
+	if (yoshi_activated) { //return if actor landed on square (dont keep giving stars)
 		return;
 	}
-	if (getWorld()->intersecting(this, getWorld()->getYoshi())) {
+	if (getWorld()->intersecting(this, getWorld()->getYoshi())) { //if runs over or lands on square
 		yoshi_activated = true;
 		if (getWorld()->getYoshi()->checkRollStatus() == false || getWorld()->getYoshi()->checkRollStatus() == true) {
 			if (getWorld()->getYoshi()->checkCoins() < 20) {
 				return;
 			}
 			else {
-				getWorld()->getYoshi()->takeCoinsfromActor(20);
+				getWorld()->getYoshi()->takeCoinsfromActor(20); //give 20 coins and get a star.
 				getWorld()->getYoshi()->giveStar();
 				getWorld()->playSound(SOUND_GIVE_STAR);
-				std::cerr << getWorld()->getYoshi()->checkStars();
-				//peach_activated = true;
+			//	std::cerr << getWorld()->getYoshi()->checkStars();
 			}
 		}
 	}
+}
+
+void DirectionalSquare::doSomething() {
+	if (getWorld()->intersecting(this, getWorld()->getPeach())) {
+		if (getSpriteDirection() == right)
+			getWorld()->getPeach()->setWalking(right);
+		else if (getSpriteDirection() == up)
+			getWorld()->getPeach()->setWalking(up);
+		else if (getSpriteDirection() == left)
+			getWorld()->getPeach()->setWalking(left);
+		else 
+			getWorld()->getPeach()->setWalking(down);
+	}
+}
+
+void PlayerActor::setWalking(int n) {
+	walkingDirection = n;
 }
 

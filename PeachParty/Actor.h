@@ -68,6 +68,7 @@ public:
 	void waitToRoll() { waitingtoroll = true; }
 	void startWalking() { waitingtoroll = false; }
 	int getWalking();
+	void setWalking(int n);
 
 	//giving stuff
 	void giveCoinstoActor(int n);
@@ -106,6 +107,17 @@ private:
 	bool yoshi_activated;
 };
 
+class DirectionalSquare : public AliveActor {
+public:
+	DirectionalSquare(StudentWorld *world, double startX, double startY, int spriteDirection) : //a forcing direction should be the same as a sprite direction
+		AliveActor(world, IID_DIR_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, spriteDirection, 1), 
+		theSpriteDirection(spriteDirection) {};
+	int getSpriteDirection() { return theSpriteDirection; }
+	void doSomething();
+private:
+	int theSpriteDirection;
+};
+
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
 public:
@@ -134,38 +146,7 @@ private:
 		Actors that DO NOT MOVE and are on the board
 */
 
-//class BoardActor : public AliveActor
-//{
-//public:
-//	BoardActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth)
-//		: AliveActor(world, imageID, startX, startY, startDirection), m_activated(true) {};
-//	virtual void doSomething() = 0;
-//	bool isActivated() { return m_activated; }
-//	void deActivate() { m_activated = false; }
-//
-//private:
-//	bool m_activated;
-//};
-//
-//class CoinSquare : public BoardActor
-//{
-//public:
-//	CoinSquare(StudentWorld* world, double startX, double startY)
-//		: BoardActor(world, IID_BLUE_COIN_SQUARE, startX, startY, 0, 1) {};
-//	virtual void doSomething();
-//private:
-//
-//
-//};
 
-//class StarSquare : public //BoardActor
-//{
-//public:
-//
-//private:
-//
-//};
-//
 //class DirectionalSquare : public //BoardActor
 //{
 //public:

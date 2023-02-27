@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-// Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
+
 
 class StudentWorld : public GameWorld
 {
@@ -18,7 +18,7 @@ public:
   virtual void cleanUp();
   ~StudentWorld();
   bool validPos(double x, double y);
-  bool canWalk(double x, double y);
+ 
 
   PlayerActor* getPeach();
   PlayerActor* getYoshi();
@@ -28,9 +28,9 @@ public:
   void addBlueCoinSquare(double x, double y);
   void addRedCoinSquare(double x, double y);
   void addStarSquare(double x, double y);
-
-  //giving objects
+  void addDirectionalSquare(double x, double y, int direction);
   
+
 
   bool intersecting(double x1, double y1, double x2, double y2);
   bool intersecting(Actor* a, Actor* b);
