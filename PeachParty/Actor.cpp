@@ -56,8 +56,18 @@ void PlayerActor::doSomething() {
 			}
 			else {
 				if (walkingDirection == up){ //if going up and hit top, go left
-					setDirection(left);
-					walkingDirection = left;
+					int m, n;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+					getPositionInThisDirection(right, 16, m, n);							//peach when going up and facing left, doesnt turn right
+					if (getWorld()->validPos(m, n)) {										//maybe just updating directional square so she faces right will fix this
+						setDirection(right);
+						walkingDirection = right;
+					}
+					int s, v;
+					getPositionInThisDirection(left, 16, s, v);
+					if (getWorld()->validPos(s, v)) {
+						setDirection(left);
+						walkingDirection = left;
+					}
 				}
 				if (walkingDirection == down) { //if walking down go right
 					//if valid direction right move right, if valid left move left
@@ -196,14 +206,40 @@ void StarSquare::doSomething() {
 
 void DirectionalSquare::doSomething() {
 	if (getWorld()->intersecting(this, getWorld()->getPeach())) {
-		if (getSpriteDirection() == right)
+		if (getSpriteDirection() == right) {
 			getWorld()->getPeach()->setWalking(right);
-		else if (getSpriteDirection() == up)
+			getWorld()->getPeach()->setDirection(right);
+		}
+		else if (getSpriteDirection() == up) {
 			getWorld()->getPeach()->setWalking(up);
-		else if (getSpriteDirection() == left)
+			getWorld()->getPeach()->setDirection(right);
+		}
+		else if (getSpriteDirection() == left) {
 			getWorld()->getPeach()->setWalking(left);
-		else if (getSpriteDirection() == down)
+			getWorld()->getPeach()->setDirection(left);
+		}
+		else {
 			getWorld()->getPeach()->setWalking(down);
+			getWorld()->getPeach()->setDirection(right);
+		}
+	}
+	if (getWorld()->intersecting(this, getWorld()->getYoshi())) {
+		if (getSpriteDirection() == right) {
+			getWorld()->getYoshi()->setWalking(right);
+			getWorld()->getYoshi()->setDirection(right);
+		}
+		else if (getSpriteDirection() == up) {
+			getWorld()->getYoshi()->setWalking(up);
+			getWorld()->getYoshi()->setDirection(right);
+		}
+		else if (getSpriteDirection() == left) {
+			getWorld()->getYoshi()->setWalking(left);
+			getWorld()->getYoshi()->setDirection(left);
+		}
+		else {
+			getWorld()->getYoshi()->setWalking(down);
+			getWorld()->getYoshi()->setDirection(right);
+		}
 	}
 }
 
@@ -233,6 +269,30 @@ void BankSquare::doSomething() {
 		else {
 			getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
 			getWorld()->addCoinstoBank(getWorld()->getPeach()->checkCoins());
+			getWorld()->playSound(SOUND_DEPOSIT_BANK);
+		}
+	}
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting bank square not active 
+		yoshi_activated = false;
+	}
+	if (yoshi_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) { //if intersecting bank square
+		getWorld()->getYoshi()->giveCoinstoActor(getWorld()->getBankCoins());
+		getWorld()->setBankBalanceToZero();
+		getWorld()->playSound(SOUND_WITHDRAW_BANK);
+		yoshi_activated = true;
+	}
+	else if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == false) {
+		if (getWorld()->getYoshi()->checkCoins() >= 5) {
+			getWorld()->getYoshi()->takeCoinsfromActor(5);
+			getWorld()->addCoinstoBank(5);
+			getWorld()->playSound(SOUND_DEPOSIT_BANK);
+		}
+		else {
+			getWorld()->getYoshi()->takeCoinsfromActor(getWorld()->getYoshi()->checkCoins());
+			getWorld()->addCoinstoBank(getWorld()->getYoshi()->checkCoins());
 			getWorld()->playSound(SOUND_DEPOSIT_BANK);
 		}
 	}
