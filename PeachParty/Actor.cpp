@@ -60,8 +60,19 @@ void PlayerActor::doSomething() {
 					walkingDirection = left;
 				}
 				if (walkingDirection == down) { //if walking down go right
-					setDirection(right);
-					walkingDirection = right;
+					//if valid direction right move right, if valid left move left
+					int g, h;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+					getPositionInThisDirection(right, 16, g, h);							//peach when going up and facing left, doesnt turn right
+					if (getWorld()->validPos(g, h)) {										//maybe just updating directional square so she faces right will fix this
+						setDirection(right);
+						walkingDirection = right;
+					}
+					int j, k;
+					getPositionInThisDirection(left, 16, j, k);
+					if (getWorld()->validPos(j, k)) {
+						setDirection(left);
+						walkingDirection = left;
+					}
 				}
 			}
 		}
@@ -84,7 +95,12 @@ void PlayerActor::giveCoinstoActor(int n) {
 }
 
 void PlayerActor::takeCoinsfromActor(int n) {
-	coins -= n;
+	if (coins < n) {
+		coins -= coins;
+	}
+	else {
+		coins -= n;
+	}
 }
 
 void PlayerActor::giveStar() {
@@ -186,7 +202,7 @@ void DirectionalSquare::doSomething() {
 			getWorld()->getPeach()->setWalking(up);
 		else if (getSpriteDirection() == left)
 			getWorld()->getPeach()->setWalking(left);
-		else 
+		else if (getSpriteDirection() == down)
 			getWorld()->getPeach()->setWalking(down);
 	}
 }
@@ -194,4 +210,33 @@ void DirectionalSquare::doSomething() {
 void PlayerActor::setWalking(int n) {
 	walkingDirection = n;
 }
+
+void BankSquare::doSomething() {
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
+		peach_activated = false;
+	}
+	if (peach_activated) {
+		return;
+	}
+	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) { //if intersecting bank square
+		getWorld()->getPeach()->giveCoinstoActor(getWorld()->getBankCoins());
+		getWorld()->setBankBalanceToZero();
+		getWorld()->playSound(SOUND_WITHDRAW_BANK);
+		peach_activated = true;
+	}
+	else if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == false) {
+		if (getWorld()->getPeach()->checkCoins() >= 5) {
+			getWorld()->getPeach()->takeCoinsfromActor(5);
+			getWorld()->addCoinstoBank(5);
+			getWorld()->playSound(SOUND_DEPOSIT_BANK);
+		}
+		else {
+			getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
+			getWorld()->addCoinstoBank(getWorld()->getPeach()->checkCoins());
+			getWorld()->playSound(SOUND_DEPOSIT_BANK);
+		}
+	}
+	
+}
+
 

@@ -29,8 +29,12 @@ public:
   void addRedCoinSquare(double x, double y);
   void addStarSquare(double x, double y);
   void addDirectionalSquare(double x, double y, int direction);
-  
+  void addBankSquare(double x, double y);
 
+  //accessors
+  int getBankCoins();
+  void addCoinstoBank(int n);
+  void setBankBalanceToZero();
 
   bool intersecting(double x1, double y1, double x2, double y2);
   bool intersecting(Actor* a, Actor* b);
@@ -38,7 +42,7 @@ public:
   bool overlap(Actor* a, Actor* b);
 
 private:
-
+	int m_bankCoins = 0;
 	Board* m_board;
 	std::vector<Actor*> actors;
 	PlayerActor* m_peach;

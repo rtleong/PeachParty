@@ -69,6 +69,7 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " has a event square\n";
                         break;
                     case Board::bank_square:
+                        addBankSquare(x, y);
                         cerr << "Location " << x << " " << y << " has a bank square\n";
                         break;
                     case Board::up_dir_square:
@@ -150,6 +151,10 @@ void StudentWorld::addDirectionalSquare(double x, double y, int direction) {
     actors.push_back(new DirectionalSquare(this, x, y, direction));
 }
 
+void StudentWorld::addBankSquare(double x, double y) {
+    actors.push_back(new BankSquare(this, x, y));
+}
+
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }
@@ -158,6 +163,17 @@ PlayerActor* StudentWorld::getYoshi() { //returns yoshi pointer for functions
     return m_yoshi;
 }
 
+int StudentWorld::getBankCoins() {
+    return m_bankCoins;
+}
+
+void StudentWorld::addCoinstoBank(int n) {
+    m_bankCoins += n;
+}
+
+void StudentWorld::setBankBalanceToZero() {
+    m_bankCoins = 0;
+}
 
 bool StudentWorld::validPos(double x, double y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
@@ -183,7 +199,12 @@ bool StudentWorld::intersecting(double x1, double y1, double x2, double y2) {
 }
 
 bool StudentWorld::intersecting(Actor* a, Actor* b) { //input two actors to get intersecting
-    return intersecting(a->getX(), a->getY(), b->getX(), b->getY());
+    if (a->getX() == b->getX()) {
+        if (a->getY() == b->getY()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool StudentWorld::overlap(double x1, double y1, double x2, double y2) { //if fully overalapped
@@ -191,5 +212,11 @@ bool StudentWorld::overlap(double x1, double y1, double x2, double y2) { //if fu
 }
 
 bool StudentWorld::overlap(Actor* a, Actor* b) { //two actors to get overlapped
-    return overlap(a->getX(), a->getY(), b->getX(), b->getY());
+    if (((abs(a->getX() - b->getX())) == 0) && ((abs(a->getY() - b->getY())) < 16)) {
+        return true;
+    }
+    if (((abs(a->getX() - b->getX())) < 16) && ((abs(a->getY() - b->getY())) == 0)) {
+        return true;
+    }
+    return false;
 }

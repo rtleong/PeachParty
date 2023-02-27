@@ -118,6 +118,16 @@ private:
 	int theSpriteDirection;
 };
 
+class BankSquare : public AliveActor {
+public:
+	BankSquare(StudentWorld* world, double startX, double startY) :
+		AliveActor(world, IID_BANK_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	void doSomething();
+private:
+	bool peach_activated;
+	bool yoshi_activated;
+};
+
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
 public:
