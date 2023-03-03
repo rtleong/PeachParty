@@ -5,6 +5,8 @@
 
 class StudentWorld;
 
+
+
 void PlayerActor::playerMove() {
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
@@ -24,7 +26,11 @@ void PlayerActor::doSomething() {
 	else return;
 	}
 	else if (checkRollStatus() == false) { //if Walking
-		
+		//
+		//check if there are two or more valid moves in each direction every tick. If there is, change status to checkRollstatus == true, 
+		// then check if user hit good key and make it do that action
+		//
+
 		int x, y;
 		getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -189,11 +195,16 @@ void PlayerActor::swapPositions() {
 	swapWalkingState();
 }
 
-void PlayerActor::teleportToRandomSquare() {
-	/*int x = randInt(0, 15);
+void PlayerActor::teleportToRandomSquare(PlayerActor* actor) {
+	int x = randInt(0, 15);
 	int y = randInt(0, 15);
-
-	if (getWorld()->validPos(x, y))*/
+	bool keepTrying = true;
+	while (keepTrying){
+		if (getWorld()->validPos(x, y)) {
+			actor->moveTo(x, y);
+			keepTrying = false;
+		}
+	}
 }
 
 void CoinSquare::doSomething() {
@@ -382,21 +393,47 @@ void EventSquare::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
 		peach_activated = false;
 	}
-	if (peach_activated) {
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting bank square not active 
+		yoshi_activated = false;
+	}
+	if (peach_activated && yoshi_activated) {
 		return;
 	}
 	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
 		int x;
 		x = randInt(1, 2);
 		if (x == 1) {
-			//teleport
+			getWorld()->getPeach()->teleportToRandomSquare(getWorld()->getPeach());
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+			peach_activated = true;
+			yoshi_activated = true;
 		}
 		if (x == 2) {
 			getWorld()->getPeach()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+			peach_activated = true;
+			yoshi_activated = true;
 		}
 		if (x == 3) {
+			//give vortex
+		}
+	}
+	if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
+		int y;
+		y = randInt(1, 2);
+		if (y == 1) {
+			getWorld()->getYoshi()->teleportToRandomSquare(getWorld()->getYoshi());
+			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+			peach_activated = true;
+			yoshi_activated = true;
+		}
+		if (y == 2) {
+			getWorld()->getYoshi()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
+			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+			peach_activated = true;
+			yoshi_activated = true;
+		}
+		if (y == 3) {
 			//give vortex
 		}
 	}
@@ -473,6 +510,26 @@ void Bowser::doSomething() { //then make bowsers functionality like Boo, just ad
 
 void Baddies::doSomething() { //make this boos functionality
 
+}
+
+void Boo::doSomething() {
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach())))
+		getWorld()->getPeach()->setInactive();
+	if (Baddies::checkPausedState() == true && getWorld()->getPeach()->isActive() == false) {
+		if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+			int randomOption = randInt(1, 2);
+			if (randomOption == 1)
+				getWorld()->getPeach()->swapCoins();
+			if (randomOption == 2)
+				getWorld()->getPeach()->swapStars();
+			getWorld()->playSound(SOUND_BOO_ACTIVATE);
+			getWorld()->getPeach()->reActivate(); //reactivates peach so shes not duplicately interacted with 
+		}
+	}
+	Baddies::decrementPauseCounter();
+	if (Baddies::checkPauseCounter == 0) {
+
+	}
 }
 
 

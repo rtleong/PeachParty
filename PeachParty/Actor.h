@@ -30,9 +30,14 @@ public:
 		: GraphObject(imageID, startX, startY, startDirection, depth), m_world(world) {};
 	virtual void doSomething() = 0;
 	StudentWorld* getWorld() { return m_world; };
-
+	virtual bool canBeHitByVortex() const = 0;
+	virtual void hitByVortex();
+	bool isActive() const { return m_ObjectActive; }
+	void setInactive() { m_ObjectActive = false; }
+	void reActivate() { m_ObjectActive = true; }
 private:
 	StudentWorld* m_world;
+	bool m_ObjectActive;
 };
 
 /*
@@ -69,7 +74,9 @@ public:
 	void swapTicks();
 	void swapWalkingDirection();
 	void swapWalkingState();
-	void teleportToRandomSquare();
+	void teleportToRandomSquare(PlayerActor* actor);
+
+	bool canBeHitByVortex() const { return false; }
 
 	//giving stuff
 	void giveCoinstoActor(int n);
@@ -106,6 +113,7 @@ public:
 		: AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1),
 		colorOfSquare(color) {};
 	virtual void doSomething();
+	bool canBeHitByVortex() const { return false; }
 	bool giveColor() { return colorOfSquare; }
 private:
 	bool colorOfSquare;
@@ -118,6 +126,7 @@ public:
 	StarSquare(StudentWorld* world, int imageID, int startX, int startY) :
 		AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
+	bool canBeHitByVortex() const { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -130,6 +139,7 @@ public:
 		theSpriteDirection(spriteDirection) {};
 	int getSpriteDirection() { return theSpriteDirection; }
 	void doSomething();
+	bool canBeHitByVortex() const { return false; }
 private:
 	int theSpriteDirection;
 };
@@ -139,6 +149,7 @@ public:
 	BankSquare(StudentWorld* world, int imageID, int startX, int startY) :
 		AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
+	bool canBeHitByVortex() const { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -149,6 +160,7 @@ public:
 	EventSquare(StudentWorld* world, int imageID, int startX, int startY) 
 		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
+	bool canBeHitByVortex() const { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -159,6 +171,7 @@ public:
 	DroppingSquare(StudentWorld* world, int imageID, int startX, int startY) //have to have bowser activate or something? Bowser passes in x and y?
 		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
+	bool canBeHitByVortex() const { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -169,10 +182,16 @@ class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 public:
 	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
 		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) :
-	AliveActor(sw, imageID, startX, startY, dir, size) {}			//num to move is num pixels to move
-	void doSomething();																				//ticks to pause starts as 180 ticks until pause
+		AliveActor(sw, imageID, startX, startY, dir, size), startInPausedState(activate_when_go_lands), numberOfTicks(number_of_ticks_to_pause) {}			//num to move is num pixels to move
+	virtual void doSomething() = 0;		//ticks to pause starts as 180 ticks until pause
+	bool canBeHitByVortex() const { return true; }
+	void hitByVortex(); //called by vortex projectile when enemy is hit with projectile
+	bool checkPausedState() { return startInPausedState; }
+	void decrementPauseCounter() { numberOfTicks--; }
+	int checkPauseCounter() { return numberOfTicks; }
 private:
-
+	bool startInPausedState; //use to show boo starts in paused state
+	int numberOfTicks;
 };
 
 class Boo : public Baddies //Baddies --> Boo 
@@ -180,7 +199,7 @@ class Boo : public Baddies //Baddies --> Boo
 public:
 	Boo(StudentWorld* sw, int imageID, int startX, int startY) 
 	: Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {} 
-
+	void doSomething();
 private:
 
 };
