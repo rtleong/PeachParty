@@ -467,5 +467,12 @@ void DroppingSquare::doSomething() { //havent tested dropping square check when 
 	}
 }
 
+void Bowser::doSomething() { //then make bowsers functionality like Boo, just added like nachen says
+
+}
+
+void Baddies::doSomething() { //make this boos functionality
+
+}
 
 

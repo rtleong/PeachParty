@@ -168,7 +168,8 @@ class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
 public:
 	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
-		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) {}			//num to move is num pixels to move
+		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) :
+	AliveActor(sw, imageID, startX, startY, dir, size) {}			//num to move is num pixels to move
 	void doSomething();																				//ticks to pause starts as 180 ticks until pause
 private:
 
@@ -187,7 +188,9 @@ private:
 class Bowser : public Baddies //Baddies --> Bowser
 {
 public:
-	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {}
+	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : 
+		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {}
+	void doSomething();
 private:
 
 };

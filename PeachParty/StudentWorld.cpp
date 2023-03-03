@@ -44,9 +44,11 @@ int StudentWorld::init()
                         cerr << "Location " << x << " " << y << " is empty.\n";
                         break;
                     case Board::boo:
+                        addBoo(x, y);
                         cerr << "Location " << x << " " << y << " has a boo.\n";
                         break;
                     case Board::bowser:
+                        addBowser(x, y);
                         cerr << "Location " << x << " " << y << " has a bowser.\n";
                         break;
                     case Board::player:
@@ -160,6 +162,14 @@ void StudentWorld::addEventSquare(double x, double y) {
     actors.push_back(new EventSquare(this, IID_EVENT_SQUARE, x, y));
 }
 
+void StudentWorld::addBowser(int x, int y) {
+    actors.push_back(new Bowser(this, IID_BOWSER, x, y));
+}
+
+void StudentWorld::addBoo(int x, int y) {
+    actors.push_back(new Boo(this, IID_BOO, x, y));
+}
+
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }
@@ -180,12 +190,6 @@ void StudentWorld::setBankBalanceToZero() {
     m_bankCoins = 0;
 }
 
-void StudentWorld::teleportRandomSquare() {
-    int x, y;
-    x = randInt(0, 15);
-    y = randInt(0, 15);
-    
-}
 
 bool StudentWorld::validPos(double x, double y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
