@@ -26,7 +26,7 @@ Actor		Baddies
 class Actor : public GraphObject
 {
 public:
-	Actor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth) 
+	Actor(StudentWorld* world, int imageID, int startX, int startY, int startDirection, double size, int depth) 
 		: GraphObject(imageID, startX, startY, startDirection, depth), m_world(world) {};
 	virtual void doSomething() = 0;
 	StudentWorld* getWorld() { return m_world; };
@@ -38,37 +38,38 @@ private:
 /*
 		Alive Actors that MOVE: PlayerActor, Yoshi, Boo, Bowser
 */
-class AliveActor : public Actor //Actors -> alive actors 
-{
-public:
-	AliveActor(StudentWorld* world, int imageID, double startX, double startY, int startDirection, int depth) //took out imageID after world
-		: Actor(world, imageID, startX, startY, startDirection, depth), activate(true) {}; //and here too
-	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
-	virtual void reActivate() { activate = true; }
-	virtual void deactivate() { activate = false; }
-	virtual void doSomething() = 0;
-private:
-	bool activate;
-};
 
-class PlayerActor : public AliveActor //main actors ->  PlayerActor
+class PlayerActor : public Actor //main actors ->  PlayerActor
 {
 public:
 	PlayerActor(StudentWorld* world, int imageID, int boardX, int boardY, int playerNumber)
-		: AliveActor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber)
+		: Actor(world, imageID, SPRITE_WIDTH* boardX, SPRITE_HEIGHT* boardY, right, 1, 0), waitingtoroll(true), walkingDirection(right), m_num(playerNumber)
 	, coins(0), stars(0) {}; // m_num(playerNumber) {};//right initializes peach with starting direction of right
 
 	virtual void doSomething();
 	//accessors
 	int checkCoins() { return coins; }
 	int checkStars() { return stars; }
-	//movement
+	int checkTicks() { return ticks_to_move; }
+	int checkDirection() { return walkingDirection; }
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
+	int getWalking(); //gets actual walking direction
+	//movement
 	void waitToRoll() { waitingtoroll = true; }
 	void startWalking() { waitingtoroll = false; }
-	int getWalking();
 	void setWalking(int n);
+
+	//mutators
+	void addMultipleStars(int n);
+	void takeMultipleStars(int n);
+	void swapStars();
+	void swapCoins();
+	void swapPositions();
+	void swapTicks();
+	void swapWalkingDirection();
+	void swapWalkingState();
+	void teleportToRandomSquare();
 
 	//giving stuff
 	void giveCoinstoActor(int n);
@@ -83,11 +84,25 @@ private:
 	int m_num; // initialize peach as 1 and yoshi as 2
 	int ticks_to_move = 0;
 	bool waitingtoroll;
+	bool isAtFork;
+};
+
+class AliveActor : public Actor //Actors -> alive actors 
+{
+public:
+	AliveActor(StudentWorld* world, int imageID, int startX, int startY, int startDirection, int depth) //took out imageID after world
+		: Actor(world, imageID, startX, startY, startDirection, 1, depth), activate(true) {}; //and here too
+	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
+	virtual void reActivate() { activate = true; }
+	virtual void deactivate() { activate = false; }
+	virtual void doSomething() = 0;
+private:
+	bool activate;
 };
 
 class CoinSquare : public AliveActor {
 public:
-	CoinSquare(StudentWorld* world, int imageID, double startX, double startY, bool color) //activate is false when initialized
+	CoinSquare(StudentWorld* world, int imageID, int startX, int startY, bool color) //activate is false when initialized
 		: AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1),
 		colorOfSquare(color) {};
 	virtual void doSomething();
@@ -100,8 +115,8 @@ private:
 
 class StarSquare : public AliveActor {
 public:
-	StarSquare(StudentWorld* world, double startX, double startY) :
-		AliveActor(world, IID_STAR_SQUARE, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
+	StarSquare(StudentWorld* world, int imageID, int startX, int startY) :
+		AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
 	bool peach_activated;
@@ -110,8 +125,8 @@ private:
 
 class DirectionalSquare : public AliveActor {
 public:
-	DirectionalSquare(StudentWorld *world, double startX, double startY, int spriteDirection) : //a forcing direction should be the same as a sprite direction
-		AliveActor(world, IID_DIR_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, spriteDirection, 1), 
+	DirectionalSquare(StudentWorld *world, int imageID, int startX, int startY, int spriteDirection) : //a forcing direction should be the same as a sprite direction
+		AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, spriteDirection, 1), 
 		theSpriteDirection(spriteDirection) {};
 	int getSpriteDirection() { return theSpriteDirection; }
 	void doSomething();
@@ -121,8 +136,8 @@ private:
 
 class BankSquare : public AliveActor {
 public:
-	BankSquare(StudentWorld* world, double startX, double startY) :
-		AliveActor(world, IID_BANK_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	BankSquare(StudentWorld* world, int imageID, int startX, int startY) :
+		AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
 	bool peach_activated;
@@ -131,8 +146,8 @@ private:
 
 class EventSquare : public AliveActor {
 public:
-	EventSquare(StudentWorld* world, double startX, double startY) 
-		: AliveActor(world, IID_EVENT_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	EventSquare(StudentWorld* world, int imageID, int startX, int startY) 
+		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
 	bool peach_activated;
@@ -141,8 +156,8 @@ private:
 
 class DroppingSquare : public AliveActor {
 public:
-	DroppingSquare(StudentWorld* world, double startX, double startY) //have to have bowser activate or something? Bowser passes in x and y?
-		: AliveActor(world, IID_DROPPING_SQUARE, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
+	DroppingSquare(StudentWorld* world, int imageID, int startX, int startY) //have to have bowser activate or something? Bowser passes in x and y?
+		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 private:
 	bool peach_activated;
@@ -152,7 +167,9 @@ private:
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 {
 public:
-
+	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
+		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) {}			//num to move is num pixels to move
+	void doSomething();																				//ticks to pause starts as 180 ticks until pause
 private:
 
 };
@@ -160,6 +177,8 @@ private:
 class Boo : public Baddies //Baddies --> Boo 
 {
 public:
+	Boo(StudentWorld* sw, int imageID, int startX, int startY) 
+	: Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {} 
 
 private:
 
@@ -168,46 +187,10 @@ private:
 class Bowser : public Baddies //Baddies --> Bowser
 {
 public:
-
+	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {}
 private:
 
 };
 
-/*
-		Actors that DO NOT MOVE and are on the board
-*/
-
-
-//class DirectionalSquare : public //BoardActor
-//{
-//public:
-//
-//private:
-//
-//};
-//
-//class BankSquare : public //BoardActor
-//{
-//public:
-//
-//private:
-//
-//};
-//
-//class EventSquare : public BoardActor
-//{
-//public:
-//
-//private:
-//
-//};
-//
-//class DroppingSquare : public BoardActor
-//{
-//public:
-//
-//private:
-//
-//};
 
 #endif // ACTOR_H_

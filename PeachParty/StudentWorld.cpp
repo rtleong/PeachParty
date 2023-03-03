@@ -145,19 +145,19 @@ void StudentWorld::addRedCoinSquare(double x, double y) {
 }
 
 void StudentWorld::addStarSquare(double x, double y) {
-    actors.push_back(new StarSquare(this, x, y));
+    actors.push_back(new StarSquare(this, IID_STAR_SQUARE, x, y));
 }
 
 void StudentWorld::addDirectionalSquare(double x, double y, int direction) {
-    actors.push_back(new DirectionalSquare(this, x, y, direction));
+    actors.push_back(new DirectionalSquare(this, IID_DIR_SQUARE, x, y, direction));
 }
 
 void StudentWorld::addBankSquare(double x, double y) {
-    actors.push_back(new BankSquare(this, x, y));
+    actors.push_back(new BankSquare(this, IID_BANK_SQUARE, x, y));
 }
 
 void StudentWorld::addEventSquare(double x, double y) {
-    actors.push_back(new EventSquare(this, x, y));
+    actors.push_back(new EventSquare(this, IID_EVENT_SQUARE, x, y));
 }
 
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions

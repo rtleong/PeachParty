@@ -121,6 +121,81 @@ void PlayerActor::takeStar() {
 	stars--;
 }
 
+void PlayerActor::takeMultipleStars(int n) {
+	if (stars < n) {
+		stars -= stars;
+	}
+	else {
+		stars -= n;
+	}
+}
+
+void PlayerActor::addMultipleStars(int n) {
+	stars += n;
+}
+void PlayerActor::swapTicks() {
+	int peachTicks = getWorld()->getPeach()->checkTicks();
+	getWorld()->getPeach()->ticks_to_move = getWorld()->getYoshi()->ticks_to_move;
+	getWorld()->getYoshi()->ticks_to_move = peachTicks;
+}
+
+void PlayerActor::swapWalkingDirection() {
+	int peachWalkDirection = getWorld()->getPeach()->checkDirection();
+	getWorld()->getPeach()->walkingDirection = getWorld()->getYoshi()->walkingDirection;
+	getWorld()->getYoshi()->walkingDirection = peachWalkDirection;
+}
+
+
+void PlayerActor::swapWalkingState() {
+	int peachWalkState = getWorld()->getPeach()->checkRollStatus();
+	getWorld()->getPeach()->waitingtoroll = getWorld()->getYoshi()->waitingtoroll;
+	getWorld()->getYoshi()->waitingtoroll = peachWalkState;
+}
+
+void PlayerActor::swapCoins() {
+	int tempPeachCoins = getWorld()->getPeach()->checkCoins();
+	int tempYoshiCoins = getWorld()->getYoshi()->checkCoins();
+
+	getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
+	getWorld()->getPeach()->giveCoinstoActor(tempYoshiCoins);
+
+	getWorld()->getYoshi()->takeCoinsfromActor(getWorld()->getYoshi()->checkCoins());
+	getWorld()->getYoshi()->giveCoinstoActor(tempPeachCoins);
+}
+
+void PlayerActor::swapStars() {
+	int tempPeachStars = getWorld()->getPeach()->checkStars();
+	int tempYoshiStars = getWorld()->getYoshi()->checkStars();
+
+	getWorld()->getPeach()->takeMultipleStars((getWorld()->getPeach()->checkStars()));
+	getWorld()->getPeach()->addMultipleStars(tempYoshiStars); //add stars 
+
+	getWorld()->getYoshi()->takeMultipleStars(getWorld()->getYoshi()->checkStars());
+	getWorld()->getYoshi()->addMultipleStars(tempPeachStars);
+}
+
+void PlayerActor::swapPositions() {
+	int peachX = getWorld()->getPeach()->getX(); int peachY = getWorld()->getPeach()->getY();
+	int peachSpriteDirection = getWorld()->getPeach()->getDirection(); //makes temp variables for yoshi and peaches location and sprite direction
+	int yoshiX = getWorld()->getYoshi()->getX(); int yoshiY = getWorld()->getYoshi()->getY();
+	int yoshiSpriteDirection = getWorld()->getYoshi()->getDirection();
+
+	getWorld()->getPeach()->moveTo(yoshiX, yoshiY);
+	getWorld()->getPeach()->setDirection(yoshiSpriteDirection); //swaps peach and yoshi
+	getWorld()->getYoshi()->moveTo(peachX, peachY);
+	getWorld()->getYoshi()->setDirection(peachSpriteDirection);
+	swapTicks();  //swaps ticks, walking direction, and walking/waiting to roll state
+	swapWalkingDirection();
+	swapWalkingState();
+}
+
+void PlayerActor::teleportToRandomSquare() {
+	/*int x = randInt(0, 15);
+	int y = randInt(0, 15);
+
+	if (getWorld()->validPos(x, y))*/
+}
+
 void CoinSquare::doSomething() {
 	if (!isActivated()) { //if not activated bc of bowser return
 		return;
@@ -302,6 +377,7 @@ void BankSquare::doSomething() {
 	}
 }
 
+
 void EventSquare::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
 		peach_activated = false;
@@ -311,15 +387,17 @@ void EventSquare::doSomething() {
 	}
 	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
 		int x;
-		x = randInt(1, 3);
+		x = randInt(1, 2);
 		if (x == 1) {
-			//teleport somehow
+			//teleport
+			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 		}
 		if (x == 2) {
-			//getWorld()->getPeach()-
+			getWorld()->getPeach()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
+			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 		}
 		if (x == 3) {
-
+			//give vortex
 		}
 	}
 }
