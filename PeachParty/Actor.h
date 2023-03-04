@@ -31,10 +31,12 @@ public:
 	virtual void doSomething() = 0;
 	StudentWorld* getWorld() { return m_world; };
 	virtual bool canBeHitByVortex() const = 0;
-	virtual void hitByVortex();
+	virtual void hitByVortex() {};
 	bool isActive() const { return m_ObjectActive; }
 	void setInactive() { m_ObjectActive = false; }
 	void reActivate() { m_ObjectActive = true; }
+	bool canWalk(int x, int y, int direction);
+	bool isAtFork();
 private:
 	StudentWorld* m_world;
 	bool m_ObjectActive;
@@ -57,6 +59,7 @@ public:
 	int checkStars() { return stars; }
 	int checkTicks() { return ticks_to_move; }
 	int checkDirection() { return walkingDirection; }
+	void changeDirection(int direction) { walkingDirection = direction; if (direction == left) setDirection(180); else setDirection(0); }
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
 	int getWalking(); //gets actual walking direction
@@ -64,6 +67,8 @@ public:
 	void waitToRoll() { waitingtoroll = true; }
 	void startWalking() { waitingtoroll = false; }
 	void setWalking(int n);
+	void moveAtFork();
+	int getAngle() { return walkingDirection; }
 
 	//mutators
 	void addMultipleStars(int n);
@@ -91,7 +96,7 @@ private:
 	int m_num; // initialize peach as 1 and yoshi as 2
 	int ticks_to_move = 0;
 	bool waitingtoroll;
-	bool isAtFork;
+	bool isForked = false;
 };
 
 class AliveActor : public Actor //Actors -> alive actors 
@@ -182,16 +187,21 @@ class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 public:
 	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
 		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) :
-		AliveActor(sw, imageID, startX, startY, dir, size), startInPausedState(activate_when_go_lands), numberOfTicks(number_of_ticks_to_pause) {}			//num to move is num pixels to move
+		AliveActor(sw, imageID, startX, startY, dir, size), startInPausedState(activate_when_go_lands), numberOfTicksPaused(number_of_ticks_to_pause), 
+		squaresToMove(num_sq_to_move) {}			//num to move is num pixels to move
 	virtual void doSomething() = 0;		//ticks to pause starts as 180 ticks until pause
 	bool canBeHitByVortex() const { return true; }
-	void hitByVortex(); //called by vortex projectile when enemy is hit with projectile
+	void hitByVortex() {}; //called by vortex projectile when enemy is hit with projectile
 	bool checkPausedState() { return startInPausedState; }
-	void decrementPauseCounter() { numberOfTicks--; }
-	int checkPauseCounter() { return numberOfTicks; }
+	void decrementPauseCounter() { numberOfTicksPaused--; }
+	int checkPauseCounter() { return numberOfTicksPaused; }
+	void adjustSquaresToMove(int n);
+	void adjustTicksToMove(int n);
 private:
 	bool startInPausedState; //use to show boo starts in paused state
-	int numberOfTicks;
+	int numberOfTicksPaused;
+	int squaresToMove;
+	int ticks_to_move = 0;
 };
 
 class Boo : public Baddies //Baddies --> Boo 

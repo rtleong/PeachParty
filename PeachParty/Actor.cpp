@@ -5,9 +5,70 @@
 
 class StudentWorld;
 
+bool Actor::canWalk(int x, int y, int direction) {
+	if (direction == right) {
+		if (getWorld()->getBoard()->getContentsOf((x/16) + 1, (y/16)) == Board::empty)
+			return false;
+	}
+	if (direction == up) {
+		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) + 1) == Board::empty)
+			return false;
+	}
+	if (direction == left) {
+		if (getWorld()->getBoard()->getContentsOf((x/16) - 1, (y/16)) == Board::empty)
+			return false;
+	}
+	if (direction == down) {
+		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) - 1) == Board::empty)
+			return false;
+	}
+	return true;
+}
 
+bool Actor::isAtFork() {
+	int count = 0;
+	if (canWalk(getX(), getY(), up))
+		count++;
+	if (canWalk(getX(), getY(), down))
+		count++;
+	if (canWalk(getX(), getY(), right))
+		count++;
+	if (canWalk(getX(), getY(), left))
+		count++;
+	if (count >= 3)
+		return true;
+	else
+		return false;
+}
+
+void PlayerActor::moveAtFork() {
+	int currentDirection = getAngle();
+	int playerInput = getWorld()->getAction(getPlayerNumber());
+	if (playerInput == ACTION_UP && canWalk(getX(), getY(), up)) {
+		changeDirection(up);
+		isForked = true;
+		startWalking();
+	}
+	if (playerInput == ACTION_RIGHT && canWalk(getX(), getY(), right)) {
+		std::cerr << "your input is fine\n";
+		changeDirection(right);
+		isForked = true;
+		startWalking();
+	}
+	if (playerInput == ACTION_LEFT && canWalk(getX(), getY(), left)) {
+		changeDirection(left);
+		isForked = true;
+		startWalking();
+	}
+	if (playerInput == ACTION_DOWN && canWalk(getX(), getY(), down)) {
+		changeDirection(down);
+		isForked = true;
+		startWalking();
+	}
+}
 
 void PlayerActor::playerMove() {
+	std::cerr << "playerMove is called\n";
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
 	if (ticks_to_move == 0) {
@@ -21,7 +82,11 @@ void PlayerActor::doSomething() {
 			int die_roll = randInt(1, 10); //walk a random number of steps
 			ticks_to_move = die_roll * 8;
 			startWalking();
-			
+			std::cerr << "pressed tab\n";
+		}
+		if (isAtFork() == true) {
+			moveAtFork();
+			std::cerr << "move at fork\n";
 		}
 	else return;
 	}
@@ -30,7 +95,10 @@ void PlayerActor::doSomething() {
 		//check if there are two or more valid moves in each direction every tick. If there is, change status to checkRollstatus == true, 
 		// then check if user hit good key and make it do that action
 		//
-
+		if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork() && isForked == false) { //add condition for directional square
+			waitToRoll();
+			std::cerr << "you set wait to roll after seeing at fork\n";
+		}
 		int x, y;
 		getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -508,8 +576,15 @@ void Bowser::doSomething() { //then make bowsers functionality like Boo, just ad
 
 }
 
-void Baddies::doSomething() { //make this boos functionality
+void Baddies::adjustSquaresToMove(int n) { //make this boos functionality
+		squaresToMove = n;
+}
 
+void Baddies::adjustTicksToMove(int n) { //make this boos functionality
+	if (ticks_to_move >= 0)
+		ticks_to_move += n;
+	if (ticks_to_move < 0)
+		ticks_to_move -= n;
 }
 
 void Boo::doSomething() {
@@ -527,9 +602,42 @@ void Boo::doSomething() {
 		}
 	}
 	Baddies::decrementPauseCounter();
-	if (Baddies::checkPauseCounter == 0) {
+	if (&Baddies::checkPauseCounter == 0) {
+		int randomSquares = randInt(1, 3);
+		Baddies::adjustSquaresToMove(randomSquares);
+		Baddies::adjustTicksToMove(randomSquares * 8);
+		//1.generate random direction 
+		//2. check if that move is valid.
+		//3. if not, generate new direction
+		//3. if is, move that way.
+		int randomDirection = randInt(1, 4);
+		if (randomDirection == 1) {
+			int a, b;
+			getPositionInThisDirection(right, 16, a, b);
+			if ((a % 16 == 0 && b % 16 == 0) && getWorld()->validPos(a, b)) {
 
+			}
+		}
+		if (randomDirection == 2) {
+
+		}
+		if (randomDirection == 3) {
+
+		}
+		if (randomDirection == 4) {
+
+		}
 	}
 }
+
+/*getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
+		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
+			if (walkingDirection == right || walkingDirection == left) {
+				int a, b;
+				getPositionInThisDirection(up, 16, a, b); //check 90* for validity
+				if (getWorld()->validPos(a, b)) {
+					setDirection(right);
+					walkingDirection = up; //change direction to move up
+				}*/
 
 

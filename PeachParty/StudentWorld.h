@@ -22,6 +22,7 @@ public:
 
   PlayerActor* getPeach();
   PlayerActor* getYoshi();
+  PlayerActor* returnPlayer(int playerNumber) { if (playerNumber == 1) return m_peach; if (playerNumber == 2) return m_yoshi; }
 
   //addding objects 
   void addPlayerActor(double x, double y);
@@ -38,6 +39,7 @@ public:
   int getBankCoins();
   void addCoinstoBank(int n);
   void setBankBalanceToZero();
+  Board* getBoard() { return m_board; }
 
   bool intersecting(double x1, double y1, double x2, double y2);
   bool intersecting(Actor* a, Actor* b);
