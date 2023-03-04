@@ -8,6 +8,8 @@
 #include <vector>
 
 
+class PlayerActor;
+class Actor;
 
 class StudentWorld : public GameWorld
 {
@@ -17,7 +19,7 @@ public:
   virtual int move();
   virtual void cleanUp();
   ~StudentWorld();
-  bool validPos(double x, double y);
+  bool validPos(int x, int y);
  
 
   PlayerActor* getPeach();
@@ -35,10 +37,15 @@ public:
   void addBowser(int x, int y);
   void addBoo(int x, int y);
 
+  //mutators
+  
+
   //accessors
   int getBankCoins();
   void addCoinstoBank(int n);
   void setBankBalanceToZero();
+  bool isThereASquareAtLocation(int dest_x ,int dest_y) const;
+  Actor* getRandomSquare(double x, double y) const;
   Board* getBoard() { return m_board; }
 
   bool intersecting(double x1, double y1, double x2, double y2);

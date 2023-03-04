@@ -31,7 +31,7 @@ public:
 	virtual void doSomething() = 0;
 	StudentWorld* getWorld() { return m_world; };
 	virtual bool canBeHitByVortex() const = 0;
-	virtual void hitByVortex() {};
+	virtual void hitByVortex() { }
 	bool isActive() const { return m_ObjectActive; }
 	void setInactive() { m_ObjectActive = false; }
 	void reActivate() { m_ObjectActive = true; }
@@ -39,7 +39,7 @@ public:
 	bool isAtFork();
 private:
 	StudentWorld* m_world;
-	bool m_ObjectActive;
+	bool m_ObjectActive = true;
 };
 
 /*
@@ -79,7 +79,7 @@ public:
 	void swapTicks();
 	void swapWalkingDirection();
 	void swapWalkingState();
-	void teleportToRandomSquare(PlayerActor* actor);
+	void teleportToRandomSquare();
 
 	bool canBeHitByVortex() const { return false; }
 
@@ -88,6 +88,9 @@ public:
 	void takeCoinsfromActor(int n);
 	void giveStar();
 	void takeStar();
+	void giveVortex() { vortexCount++; }
+	void removeVortex() { vortexCount--; }
+
 private:
 	void playerMove();
 	int stars;
@@ -97,6 +100,8 @@ private:
 	int ticks_to_move = 0;
 	bool waitingtoroll;
 	bool isForked = false;
+	int vortexCount = 0;
+	bool hasAVortex = false;
 };
 
 class AliveActor : public Actor //Actors -> alive actors 
@@ -110,6 +115,20 @@ public:
 	virtual void doSomething() = 0;
 private:
 	bool activate;
+};
+
+class Vortex : public AliveActor
+{
+public:
+	Vortex(StudentWorld* sw, int imageID, int startX, int startY, int direction) //may need to make it DIR direction
+		: AliveActor(sw, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, 0, 0), m_vortexDirection(direction) {}
+	bool canBeHitByVortex() const { return false; }
+	void doSomething();
+	std::vector<Actor*> do_i_activate;
+private:
+	
+	int m_vortexDirection;
+
 };
 
 class CoinSquare : public AliveActor {

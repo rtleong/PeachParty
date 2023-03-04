@@ -3,6 +3,8 @@
 #include "GameConstants.h"
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include "Board.h"
 using namespace std;
 
@@ -109,6 +111,20 @@ int StudentWorld::move()
         a->doSomething();
     }
     return GWSTATUS_CONTINUE_GAME;
+
+    std::ostringstream oss;
+
+    oss.fill('0');
+    oss << "Roll: ";
+  //  oss << setw(6) << returnPlayer(getPlayerNumber())->checkTicks()/8 << "  ";
+
+    oss << "Stars: ";
+    //oss << returnPlayer(getPlayerNumber())-> checkStars() << "  ";
+
+
+    setGameStatText(oss.str());
+
+    return GWSTATUS_CONTINUE_GAME;
 }
 
 StudentWorld::~StudentWorld() {
@@ -190,8 +206,23 @@ void StudentWorld::setBankBalanceToZero() {
     m_bankCoins = 0;
 }
 
+//Actor* StudentWorld::getRandomSquare(double x, double y) const {
+//    //if (isThereASquareAtLocation(x, y) == true) {
+//    //    return actors;
+//    //}
+//    return;
+//}
 
-bool StudentWorld::validPos(double x, double y) {
+bool StudentWorld::isThereASquareAtLocation(int x, int y) const {
+    Board::GridEntry grent = m_board->getContentsOf(int(x), int(y));
+    if (grent == Board::GridEntry::empty) {
+        return false;
+    }
+    else
+        return true;
+}
+
+bool StudentWorld::validPos(int x, int y) {
     Board::GridEntry grent = m_board->getContentsOf(int(x/16), int(y/16));
     if (grent == Board::GridEntry::empty) { //if next position on board is empty
         return false;   //only passing in x+16, y, or x, y-16, or other 4 directions
@@ -201,7 +232,7 @@ bool StudentWorld::validPos(double x, double y) {
         return true; //if outside of screen retun false
     }
     else {
-        return true; //check this if moving invalidly
+        return false; //check this if moving invalidly
     }
 }
 

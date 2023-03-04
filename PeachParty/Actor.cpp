@@ -42,41 +42,49 @@ bool Actor::isAtFork() {
 }
 
 void PlayerActor::moveAtFork() {
-	int currentDirection = getAngle();
+	//int currentDirection = getAngle();
 	int playerInput = getWorld()->getAction(getPlayerNumber());
 	if (playerInput == ACTION_UP && canWalk(getX(), getY(), up)) {
+		std::cerr << "your input is fine\n";
 		changeDirection(up);
-		isForked = true;
+		//isForked = false;
 		startWalking();
 	}
 	if (playerInput == ACTION_RIGHT && canWalk(getX(), getY(), right)) {
 		std::cerr << "your input is fine\n";
 		changeDirection(right);
-		isForked = true;
+		//isForked = true;
 		startWalking();
 	}
 	if (playerInput == ACTION_LEFT && canWalk(getX(), getY(), left)) {
 		changeDirection(left);
-		isForked = true;
+		//isForked = true;
 		startWalking();
 	}
 	if (playerInput == ACTION_DOWN && canWalk(getX(), getY(), down)) {
 		changeDirection(down);
-		isForked = true;
+		//isForked = false;
 		startWalking();
 	}
+	else
+		return;
 }
 
 void PlayerActor::playerMove() {
 	std::cerr << "playerMove is called\n";
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
+	std::cerr << ticks_to_move << "\n";
 	if (ticks_to_move == 0) {
 		waitToRoll();
+		std::cerr << "you hit the new wait to roll in playerMove\n";
 	}
 }
 
 void PlayerActor::doSomething() {
+	//if (checkRollStatus() == true && isForked == true) {
+	//	std::cerr << "entered new fork statement\n";
+	//	moveAtFork(); //forked is broken }
 	if (checkRollStatus() == true) { //if waiting to roll
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //and tab is hit
 			int die_roll = randInt(1, 10); //walk a random number of steps
@@ -84,21 +92,23 @@ void PlayerActor::doSomething() {
 			startWalking();
 			std::cerr << "pressed tab\n";
 		}
-		if (isAtFork() == true) {
-			moveAtFork();
-			std::cerr << "move at fork\n";
+		if (getWorld()->getAction(getPlayerNumber()) == ACTION_FIRE) {
+
 		}
-	else return;
+		/*else if (getWorld()->getAction(getPlayerNumber()) == ACTION_RIGHT) {
+			std::cerr << "input worked\n";
+			changeDirection(right);
+			startWalking();
+		}*/
+		else return;
 	}
 	else if (checkRollStatus() == false) { //if Walking
-		//
-		//check if there are two or more valid moves in each direction every tick. If there is, change status to checkRollstatus == true, 
-		// then check if user hit good key and make it do that action
-		//
-		if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork() && isForked == false) { //add condition for directional square
-			waitToRoll();
-			std::cerr << "you set wait to roll after seeing at fork\n";
-		}
+	
+		//if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) { //add condition for directional square && isForked == false
+		//	waitToRoll();
+		//	std::cerr << "you set wait to roll after seeing at fork\n";
+		//	return;
+		//}
 		int x, y;
 		getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -263,13 +273,15 @@ void PlayerActor::swapPositions() {
 	swapWalkingState();
 }
 
-void PlayerActor::teleportToRandomSquare(PlayerActor* actor) {
-	int x = randInt(0, 15);
-	int y = randInt(0, 15);
+void PlayerActor::teleportToRandomSquare() {
 	bool keepTrying = true;
 	while (keepTrying){
+		int x = randInt(0, 15);
+		int y = randInt(0, 15);
+		x = x * 16; y = y * 16;
 		if (getWorld()->validPos(x, y)) {
-			actor->moveTo(x, y);
+			std::cerr << "get to move\n";
+			(getWorld()->returnPlayer(getPlayerNumber()))->moveTo(x, y);
 			keepTrying = false;
 		}
 	}
@@ -356,7 +368,6 @@ void StarSquare::doSomething() {
 				getWorld()->getYoshi()->takeCoinsfromActor(20); //give 20 coins and get a star.
 				getWorld()->getYoshi()->giveStar();
 				getWorld()->playSound(SOUND_GIVE_STAR);
-			//	std::cerr << getWorld()->getYoshi()->checkStars();
 			}
 		}
 	}
@@ -464,17 +475,18 @@ void EventSquare::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting bank square not active 
 		yoshi_activated = false;
 	}
-	if (peach_activated && yoshi_activated) {
+	if (peach_activated && yoshi_activated) { //this doesnt fully work but is better than having each yoshi and peach activate twice
 		return;
 	}
 	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+		if (peach_activated)
+			return;
 		int x;
 		x = randInt(1, 2);
 		if (x == 1) {
-			getWorld()->getPeach()->teleportToRandomSquare(getWorld()->getPeach());
+			getWorld()->getPeach()->teleportToRandomSquare();
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			peach_activated = true;
-			yoshi_activated = true;
 		}
 		if (x == 2) {
 			getWorld()->getPeach()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
@@ -483,29 +495,30 @@ void EventSquare::doSomething() {
 			yoshi_activated = true;
 		}
 		if (x == 3) {
-			//give vortex
+			getWorld()->getPeach()->giveVortex();
 		}
 	}
-	if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
-		int y;
-		y = randInt(1, 2);
-		if (y == 1) {
-			getWorld()->getYoshi()->teleportToRandomSquare(getWorld()->getYoshi());
-			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
-			peach_activated = true;
-			yoshi_activated = true;
-		}
-		if (y == 2) {
-			getWorld()->getYoshi()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
-			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
-			peach_activated = true;
-			yoshi_activated = true;
-		}
-		if (y == 3) {
-			//give vortex
+		if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
+			if (yoshi_activated)
+				return;
+			int y;
+			y = randInt(1, 2);
+			if (y == 1) {
+				getWorld()->getYoshi()->teleportToRandomSquare();
+				getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+				yoshi_activated = true;
+			}
+			if (y == 2) {
+				getWorld()->getYoshi()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
+				getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+				peach_activated = true;
+				yoshi_activated = true;
+			}
+			if (y == 3) {
+				//give vortex
+			}
 		}
 	}
-}
 
 void DroppingSquare::doSomething() { //havent tested dropping square check when we finally do bowser...
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach()))) { //if not intersecting bank square not active 
@@ -630,14 +643,18 @@ void Boo::doSomething() {
 	}
 }
 
-/*getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
-		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
-			if (walkingDirection == right || walkingDirection == left) {
-				int a, b;
-				getPositionInThisDirection(up, 16, a, b); //check 90* for validity
-				if (getWorld()->validPos(a, b)) {
-					setDirection(right);
-					walkingDirection = up; //change direction to move up
-				}*/
+void Vortex::doSomething() {
+	////if vortex is overlapping with impactable object
+	//if (!(isActive()))
+	//	return;
+	////if () check if it leaves screen
+	//if (isActive()) {
+	//	moveAtAngle(m_vortexDirection, 2);
+	//	if (getWorld()->overlap(this, ))
+	//}
+}
+
+
+
 
 
