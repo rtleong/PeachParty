@@ -29,7 +29,7 @@ StudentWorld::StudentWorld(string assetPath)
 int StudentWorld::init()
 {
    
-        startCountdownTimer(3); //start countdown
+        startCountdownTimer(99); //start countdown
         string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt"; 
         Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)

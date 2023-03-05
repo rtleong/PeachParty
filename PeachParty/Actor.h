@@ -207,38 +207,49 @@ class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 public:
 	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
 		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) :
-		AliveActor(sw, imageID, startX, startY, dir, depth), startInPausedState(activate_when_go_lands), numberOfTicksPaused(number_of_ticks_to_pause), 
+		AliveActor(sw, imageID, startX, startY, dir, depth), IAmPaused(activate_when_go_lands), numberOfTicksPaused(number_of_ticks_to_pause), 
 		squaresToMove(num_sq_to_move) {}			//num to move is num pixels to move
 	virtual void doSomething() = 0;		//ticks to pause starts as 180 ticks until pause
 	bool canBeHitByVortex() const { return true; }
 	void hitByVortex() {}; //called by vortex projectile when enemy is hit with projectile
-	bool checkPausedState() { return startInPausedState; }
+	bool checkPausedState() { return IAmPaused; }
 	void decrementPauseCounter() { numberOfTicksPaused--; }
+	void adjustPauseCounterto180() { numberOfTicksPaused = 180; }
 	int checkPauseCounter() { return numberOfTicksPaused; }
 	void adjustSquaresToMove(int n);
 	void adjustTicksToMove(int n);
+	void decrementTicksToMove() { if (ticks_to_move <= 0) return; ticks_to_move--; }
+	int returnTicksToMove() { return ticks_to_move; }
+
+	void changeWalkingDirection(int n) { walkingDirection = n; }
+	void moveRandomly();
+	void startWalking() {IAmPaused = false; }
+	void goBackToPaused() { IAmPaused = true; }
 private:
-	bool startInPausedState; //use to show boo starts in paused state
+	bool IAmPaused; //use to show boo starts in paused state
 	int numberOfTicksPaused;
 	int squaresToMove;
 	int ticks_to_move = 0;
+	int walkingDirection;
 };
 
 class Boo : public Baddies //Baddies --> Boo 
 {
 public:
 	Boo(StudentWorld* sw, int imageID, int startX, int startY) 
-	: Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {} 
+	: Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180), walkingDirection(right) {}
 	void doSomething();
 private:
-
+	bool m_activatedPeach = false;
+	bool m_activatedYoshi = false;
+	int walkingDirection;
 };
 
 class Bowser : public Baddies //Baddies --> Bowser
 {
 public:
 	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : 
-		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, false, 0, 180) {}
+		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180) {}
 	void doSomething();
 private:
 
