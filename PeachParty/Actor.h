@@ -122,14 +122,13 @@ class Vortex : public AliveActor
 {
 public:
 	Vortex(StudentWorld* sw, int imageID, int startX, int startY, int direction) //may need to make it DIR direction
-		: AliveActor(sw, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, 0, 0), m_vortexDirection(direction) {}
+		: AliveActor(sw, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, 0, 0), firing_direction(direction) {}
 	bool canBeHitByVortex() const { return false; }
 	void doSomething();
 	std::vector<Actor*> do_i_activate;
 private:
-	
-	int m_vortexDirection;
-
+	int firing_direction;
+	bool isActive;
 };
 
 class CoinSquare : public AliveActor {
@@ -222,6 +221,7 @@ public:
 	void decrementTicksToMove() { if (ticks_to_move <= 0) return; ticks_to_move--; }
 	int returnTicksToMove() { return ticks_to_move; }
 
+	void BaddieMove();
 	void changeWalkingDirection(int n) { walkingDirection = n; }
 	void moveRandomly();
 	void startWalking() {IAmPaused = false; }
@@ -250,10 +250,12 @@ class Bowser : public Baddies //Baddies --> Bowser
 {
 public:
 	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : 
-		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180) {}
+		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180), walkingDirection(right) {}
 	void doSomething();
 private:
-
+	bool m_activatedPeach = false;
+	bool m_activatedYoshi = false;
+	int walkingDirection;
 };
 
 

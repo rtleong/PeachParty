@@ -36,6 +36,7 @@ public:
   void addEventSquare(double x, double y);
   void addBowser(int x, int y);
   void addBoo(int x, int y);
+  void addVortex(int x, int y, int direction);
 
   //mutators
   

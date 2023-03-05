@@ -213,6 +213,10 @@ void StudentWorld::addBoo(int x, int y) {
     actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
 }
 
+void StudentWorld::addVortex(int x, int y, int direction) {
+    actors.push_back(new Vortex(this, IID_VORTEX, x, y, direction));
+}
+
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }

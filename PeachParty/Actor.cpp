@@ -44,7 +44,7 @@ bool Actor::isAtFork() {
 void PlayerActor::moveAtFork() {
 	int playerInput = getWorld()->getAction(getPlayerNumber());
 	if (playerInput == ACTION_UP && canWalk(getX(), getY(), up)) {
-		std::cerr << "your input is fine\n";
+		//std::cerr << "your input is fine\n";
 		changeDirection(up);
 		isForked = true;
 		startWalking();
@@ -70,13 +70,13 @@ void PlayerActor::moveAtFork() {
 }
 
 void PlayerActor::playerMove() {
-	std::cerr << "playerMove is called\n";
+	//std::cerr << "playerMove is called\n";
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
-	std::cerr << ticks_to_move << "\n";
+	//std::cerr << ticks_to_move << "\n";
 	if (ticks_to_move <= 0) {
 		waitToRoll();
-		std::cerr << "you hit the new wait to roll in playerMove\n";
+		//std::cerr << "you hit the new wait to roll in playerMove\n";
 	}
 }
 
@@ -86,21 +86,27 @@ void PlayerActor::doSomething() {
 			int die_roll = randInt(1, 10); //walk a random number of steps
 			ticks_to_move = die_roll * 8;
 			startWalking();
-			std::cerr << "pressed tab\n";
+			//std::cerr << "pressed tab\n";
 		}
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_FIRE) {
-
+			if (checkIfHasVortex()) {
+				int a, b;
+				getPositionInThisDirection(getWalking(), 16, a, b);
+				getWorld()->addVortex(a / 16, b / 16, getWalking());
+				getWorld()->playSound(SOUND_PLAYER_FIRE);
+				vortexCount = 0;
+				hasAVortex = false;
+			}
 		}
 		else return;
 	}
 	else if (checkRollStatus() == false) { //if Walking
-		if (!(getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) && isForked == true) {
+		/*if (!(getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) && isForked == true) {
 			isForked = false;
-		}
-	}
+		}*/
 		if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork() && isForked == false) {// && isForked == false) {
 			moveAtFork();					//add condition for directional square && isForked == false
-			std::cerr << "you set wait to roll after seeing at fork\n";
+			//std::cerr << "you set wait to roll after seeing at fork\n";
 			return;
 		}
 		int x, y;
@@ -164,9 +170,12 @@ void PlayerActor::doSomething() {
 				}
 			}
 		}
-	else
-		playerMove(); //move if all positions are valid
+		else
+			playerMove();
 	}
+	/*else
+		playerMove();*/ //move if all positions are valid
+}
 	//}
 
 int PlayerActor::getPlayerNumber() {
@@ -475,7 +484,7 @@ void EventSquare::doSomething() {
 		if (peach_activated)
 			return;
 		int x;
-		x = randInt(1, 2);
+		x = randInt(1, 3);
 		if (x == 1) {
 			getWorld()->getPeach()->teleportToRandomSquare();
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
@@ -495,7 +504,7 @@ void EventSquare::doSomething() {
 			if (yoshi_activated)
 				return;
 			int y;
-			y = randInt(1, 2);
+			y = randInt(1, 3);
 			if (y == 1) {
 				getWorld()->getYoshi()->teleportToRandomSquare();
 				getWorld()->playSound(SOUND_PLAYER_TELEPORT);
@@ -508,7 +517,7 @@ void EventSquare::doSomething() {
 				yoshi_activated = true;
 			}
 			if (y == 3) {
-				//give vortex
+				getWorld()->getYoshi()->giveVortex();
 			}
 		}
 	}
@@ -579,7 +588,24 @@ void DroppingSquare::doSomething() { //havent tested dropping square check when 
 }
 
 void Bowser::doSomething() { //then make bowsers functionality like Boo, just added like nachen says
-
+	if (!(getWorld()->intersecting(this, getWorld()->getPeach())))
+		m_activatedPeach = false;
+	if (checkPausedState() == true) {
+		if (m_activatedPeach == false) { //if boo is paused and peach lands on boo
+			if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+				int randomOption = randInt(0, 1); //randomly decide to swap coins and stars with other player
+				if (randomOption == 0) {
+					getWorld()->getPeach()->takeMultipleStars(getWorld()->getPeach()->checkStars());
+					getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
+					getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+					m_activatedPeach = true;
+				}
+				if (randomOption == 1)
+					return;
+				m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
+			}
+		}
+	}
 }
 
 void Baddies::adjustSquaresToMove(int n) { //make this boos functionality
@@ -593,52 +619,80 @@ void Baddies::adjustTicksToMove(int n) { //make this boos functionality
 		ticks_to_move -= n;
 }
 
+void Baddies::BaddieMove() {
+	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
+	ticks_to_move--;
+	//std::cerr << ticks_to_move << "\n";
+	if (ticks_to_move <= 0) {
+		IAmPaused = true;
+		//std::cerr << "you hit the new wait to roll in playerMove\n";
+	}
+}
+
 void Baddies::moveRandomly() {
-	int randomSquares = randInt(1, 3);
-	Baddies::adjustSquaresToMove(randomSquares);
-	std::cerr << checkSquaresToMove() << "\n";
-	Baddies::adjustTicksToMove(randomSquares * 8);
-	//1.generate random direction 
-	//2. check if that move is valid.
-	//3. if not, generate new direction
-	//3. if is, move that way.
-	int randomDirection = randInt(1, 4);
-	if (randomDirection == 1) {
-		int a, b;
-		getPositionInThisDirection(right, 16, a, b);
-		if ((a % 16 == 0 && b % 16 == 0) && getWorld()->validPos(a, b)) {
-			setDirection(right);
-			changeWalkingDirection(right);
-			startWalking();
+	int x, y;
+	getPositionInThisDirection(walkingDirection, 16, x, y); //check every position for validity in direction + 16
+	if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
+		if (walkingDirection == right || walkingDirection == left) {
+			int a, b;
+			getPositionInThisDirection(up, 16, a, b); //check 90* for validity
+			if (getWorld()->validPos(a, b)) {
+				setDirection(right);
+				walkingDirection = up; //change direction to move up
+			}
+			else {
+				int e, f;
+				getPositionInThisDirection(down, 16, e, f); //check 270* for validity
+				if (getWorld()->validPos(e, f)) {
+					setDirection(right);
+					walkingDirection = down;
+				}
+				else {
+					if (walkingDirection == right) { //if only way is left, go left
+						setDirection(left);
+						walkingDirection = left;
+					}
+					else {
+						setDirection(right); //if going down and hit bottom, go right
+						walkingDirection = right;
+					}
+				}
+			}
+		}
+		else {
+			if (walkingDirection == up) { //if going up and hit top, go left
+				int m, n;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+				getPositionInThisDirection(right, 16, m, n);							//peach when going up and facing left, doesnt turn right
+				if (getWorld()->validPos(m, n)) {										//maybe just updating directional square so she faces right will fix this
+					setDirection(right);
+					walkingDirection = right;
+				}
+				int s, v;
+				getPositionInThisDirection(left, 16, s, v);
+				if (getWorld()->validPos(s, v)) {
+					setDirection(left);
+					walkingDirection = left;
+				}
+			}
+			if (walkingDirection == down) { //if walking down go right
+				//if valid direction right move right, if valid left move left
+				int g, h;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+				getPositionInThisDirection(right, 16, g, h);							//peach when going up and facing left, doesnt turn right
+				if (getWorld()->validPos(g, h)) {										//maybe just updating directional square so she faces right will fix this
+					setDirection(right);
+					walkingDirection = right;
+				}
+				int j, k;
+				getPositionInThisDirection(left, 16, j, k);
+				if (getWorld()->validPos(j, k)) {
+					setDirection(left);
+					walkingDirection = left;
+				}
+			}
 		}
 	}
-	if (randomDirection == 2) {
-		int c, d;
-		getPositionInThisDirection(down, 16, c, d);
-		if ((c % 16 == 0 && d % 16 == 0) && getWorld()->validPos(c, d)) {
-			setDirection(right);
-			changeWalkingDirection(down);
-			startWalking();
-		}
-	}
-	if (randomDirection == 3) {
-		int e, f;
-		getPositionInThisDirection(up, 16, e, f);
-		if ((e % 16 == 0 && f % 16 == 0) && getWorld()->validPos(e, f)) {
-			setDirection(right);
-			changeWalkingDirection(up);
-			startWalking();
-		}
-	}
-	if (randomDirection == 4) {
-		int g, h;
-		getPositionInThisDirection(left, 16, g, h);
-		if ((g % 16 == 0 && h % 16 == 0) && getWorld()->validPos(g, h)) {
-			setDirection(left);
-			changeWalkingDirection(left);
-			startWalking();
-		}
-	}
+	else
+		BaddieMove(); //move if all positions are valid
 }
 
 void Boo::doSomething() {
@@ -672,15 +726,19 @@ void Boo::doSomething() {
 	}
 	decrementPauseCounter();
 	std::cerr << checkPauseCounter();
-	if (checkPauseCounter() <= 0) {
+	if (checkPauseCounter() <= 0 && checkPausedState() == true) {
 		std::cerr << "you called moveRandomly";
-		moveRandomly();
+		int randomSquares = randInt(1, 3);
+	Baddies::adjustSquaresToMove(randomSquares);
+	std::cerr << checkSquaresToMove() << "\n";
+	Baddies::adjustTicksToMove(randomSquares * 8);
+	startWalking();
 	}
 }
 	else if (checkPausedState() == false) {
-		if (isAtFork() && (getX() % 16 == 0 && getY() % 16 == 0)) {
+		/*if (isAtFork() && (getX() % 16 == 0 && getY() % 16 == 0)) {
 			moveRandomly();
-		}
+		}*/
 		int x, y;
 		getPositionInThisDirection(walkingDirection, 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -742,27 +800,26 @@ void Boo::doSomething() {
 				}
 			}
 		}
-	}
-	else{
-		moveAtAngle(walkingDirection, 2);
-	Baddies::adjustTicksToMove(-1);
-	if (Baddies::returnTicksToMove() == 0) {
-		goBackToPaused();
-		adjustPauseCounterto180();
+		else {
+			moveAtAngle(walkingDirection, 2);
+			Baddies::adjustTicksToMove(-1);
+			if (Baddies::returnTicksToMove() == 0) {
+				goBackToPaused();
+				adjustPauseCounterto180();
+			}
 		}
 	}
 }
 
 
 void Vortex::doSomething() {
-	////if vortex is overlapping with impactable object
-	//if (!(isActive()))
-	//	return;
-	////if () check if it leaves screen
-	//if (isActive()) {
-	//	moveAtAngle(m_vortexDirection, 2);
-	//	if (getWorld()->overlap(this, ))
-	//}
+	int a, b;
+	getPositionInThisDirection(firing_direction, 2, a, b);
+	moveAtAngle(firing_direction, 2);
+
+	if (a < 0 || a >= SPRITE_WIDTH * 16 || b < 0 || b >= SPRITE_HEIGHT * 16) {
+		isActive = false;
+	}
 }
 
 
