@@ -103,6 +103,7 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
+    //if game is over, decide who won based on stars>coins, and coins>coins if stars == stars, and if tie return peach won.
     if (timeRemaining() < 0) {
         playSound(SOUND_GAME_FINISHED);
         if (getStars(m_peach) > getStars(m_yoshi)) {
@@ -131,6 +132,7 @@ int StudentWorld::move()
     for (Actor* a : actors) { //all actors need to do there "something"
         a->doSomething();
     }
+    //string display on screen
     std::ostringstream oss; //may have to debug this
     oss << "P1 ";
     oss << "Roll: " << getTicks(m_peach) << " ";

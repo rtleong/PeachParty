@@ -5,7 +5,7 @@
 
 class StudentWorld;
 
-bool Actor::canWalk(int x, int y, int direction) {
+bool Actor::canWalk(int x, int y, int direction) { //if contents are empty, dont walk there, if they aren't it is a valid square to walk to 
 	if (direction == right) {
 		if (getWorld()->getBoard()->getContentsOf((x / 16) + 1, (y / 16)) == Board::GridEntry::empty)
 			return false;
@@ -25,7 +25,7 @@ bool Actor::canWalk(int x, int y, int direction) {
 	return true;
 }
 
-bool Actor::isAtFork() {
+bool Actor::isAtFork() { //if more than two directions are possible to move in, you are at a fork
 	int count = 0;
 	if (canWalk(getX(), getY(), up))
 		count++;
@@ -41,7 +41,7 @@ bool Actor::isAtFork() {
 		return false;
 }
 
-void PlayerActor::moveAtFork() {
+void PlayerActor::moveAtFork() { //move at fork if at fork
 	int playerInput = getWorld()->getAction(getPlayerNumber());
 	if (playerInput == ACTION_UP && canWalk(getX(), getY(), up)) {
 		//std::cerr << "your input is fine\n";
@@ -49,8 +49,8 @@ void PlayerActor::moveAtFork() {
 		isForked = true;
 		startWalking();
 	}
-	if (playerInput == ACTION_RIGHT && canWalk(getX(), getY(), right)) {
-		std::cerr << "your input is fine\n";
+	if (playerInput == ACTION_RIGHT && canWalk(getX(), getY(), right)) { //if the user presses a direction key
+		//std::cerr << "your input is fine\n";							//move in that direction
 		changeDirection(right);
 		isForked = true;
 		startWalking();
@@ -70,13 +70,10 @@ void PlayerActor::moveAtFork() {
 }
 
 void PlayerActor::playerMove() {
-	//std::cerr << "playerMove is called\n";
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
-	//std::cerr << ticks_to_move << "\n";
 	if (ticks_to_move <= 0) {
 		waitToRoll();
-		//std::cerr << "you hit the new wait to roll in playerMove\n";
 	}
 }
 
@@ -89,7 +86,7 @@ void PlayerActor::doSomething() {
 			//std::cerr << "pressed tab\n";
 		}
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_FIRE) {
-			if (checkIfHasVortex()) {
+			if (checkIfHasVortex()) { //shoot vortex
 				int a, b;
 				getPositionInThisDirection(getWalking(), 16, a, b);
 				getWorld()->addVortex(a / 16, b / 16, getWalking());
@@ -220,7 +217,7 @@ void PlayerActor::addMultipleStars(int n) {
 	stars += n;
 }
 void PlayerActor::swapTicks() {
-	int peachTicks = getWorld()->getPeach()->checkTicks();
+	int peachTicks = getWorld()->getPeach()->checkTicks(); //add multiple stars to actor
 	getWorld()->getPeach()->ticks_to_move = getWorld()->getYoshi()->ticks_to_move;
 	getWorld()->getYoshi()->ticks_to_move = peachTicks;
 }
@@ -232,14 +229,14 @@ void PlayerActor::swapWalkingDirection() {
 }
 
 
-void PlayerActor::swapWalkingState() {
+void PlayerActor::swapWalkingState() { //swap waitingToRoll or Walking status
 	int peachWalkState = getWorld()->getPeach()->checkRollStatus();
 	getWorld()->getPeach()->waitingtoroll = getWorld()->getYoshi()->waitingtoroll;
 	getWorld()->getYoshi()->waitingtoroll = peachWalkState;
 }
 
 void PlayerActor::swapCoins() {
-	int tempPeachCoins = getWorld()->getPeach()->checkCoins();
+	int tempPeachCoins = getWorld()->getPeach()->checkCoins(); 
 	int tempYoshiCoins = getWorld()->getYoshi()->checkCoins();
 
 	getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
@@ -260,7 +257,7 @@ void PlayerActor::swapStars() {
 	getWorld()->getYoshi()->addMultipleStars(tempPeachStars);
 }
 
-void PlayerActor::swapPositions() {
+void PlayerActor::swapPositions() { //swap positions and status's with each other
 	int peachX = getWorld()->getPeach()->getX(); int peachY = getWorld()->getPeach()->getY();
 	int peachSpriteDirection = getWorld()->getPeach()->getDirection(); //makes temp variables for yoshi and peaches location and sprite direction
 	int yoshiX = getWorld()->getYoshi()->getX(); int yoshiY = getWorld()->getYoshi()->getY();
@@ -275,7 +272,7 @@ void PlayerActor::swapPositions() {
 	swapWalkingState();
 }
 
-void PlayerActor::teleportToRandomSquare() {
+void PlayerActor::teleportToRandomSquare() { //teleport player to random square
 	bool keepTrying = true;
 	while (keepTrying){
 		int x = randInt(0, 15);
@@ -381,7 +378,7 @@ void DirectionalSquare::doSomething() {
 			getWorld()->getPeach()->setWalking(right);
 			getWorld()->getPeach()->setDirection(right);
 		}
-		else if (getSpriteDirection() == up) {
+		else if (getSpriteDirection() == up) { //whatever direction directional square is, omve player in that direction
 			getWorld()->getPeach()->setWalking(up);
 			getWorld()->getPeach()->setDirection(right);
 		}
@@ -393,7 +390,7 @@ void DirectionalSquare::doSomething() {
 			getWorld()->getPeach()->setWalking(down);
 			getWorld()->getPeach()->setDirection(right);
 		}
-	}
+	}//whatever direction directional square is, omve player in that direction
 	if (getWorld()->intersecting(this, getWorld()->getYoshi())) {
 		if (getSpriteDirection() == right) {
 			getWorld()->getYoshi()->setWalking(right);
@@ -427,13 +424,13 @@ void BankSquare::doSomething() {
 	}
 	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) { //if intersecting bank square
 		getWorld()->getPeach()->giveCoinstoActor(getWorld()->getBankCoins());
-		getWorld()->setBankBalanceToZero();
+		getWorld()->setBankBalanceToZero(); //give peach all coins and set bank balance to zero
 		getWorld()->playSound(SOUND_WITHDRAW_BANK);
 		peach_activated = true;
 	}
 	else if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == false) {
 		if (getWorld()->getPeach()->checkCoins() >= 5) {
-			getWorld()->getPeach()->takeCoinsfromActor(5);
+			getWorld()->getPeach()->takeCoinsfromActor(5); //if walking over deopsit 5 peach coins
 			getWorld()->addCoinstoBank(5);
 			getWorld()->playSound(SOUND_DEPOSIT_BANK);	
 		}
@@ -451,14 +448,14 @@ void BankSquare::doSomething() {
 	}
 	if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) { //if intersecting bank square
 		getWorld()->getYoshi()->giveCoinstoActor(getWorld()->getBankCoins());
-		getWorld()->setBankBalanceToZero();
+		getWorld()->setBankBalanceToZero(); //give all coins to yoshi
 		getWorld()->playSound(SOUND_WITHDRAW_BANK);
 		yoshi_activated = true;
 	}
 	else if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == false) {
 		if (getWorld()->getYoshi()->checkCoins() >= 5) {
 			getWorld()->getYoshi()->takeCoinsfromActor(5);
-			getWorld()->addCoinstoBank(5);
+			getWorld()->addCoinstoBank(5); //deposit 5 yoshi coins
 			getWorld()->playSound(SOUND_DEPOSIT_BANK);
 		}
 		else {
@@ -477,7 +474,7 @@ void EventSquare::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getYoshi()))) { //if not intersecting bank square not active 
 		yoshi_activated = false;
 	}
-	if (peach_activated && yoshi_activated) { //this doesnt fully work but is better than having each yoshi and peach activate twice
+	if (peach_activated && yoshi_activated) { //return so peach and yoshi dont activate twice
 		return;
 	}
 	if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
@@ -491,7 +488,7 @@ void EventSquare::doSomething() {
 			peach_activated = true;
 		}
 		if (x == 2) {
-			getWorld()->getPeach()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
+			getWorld()->getPeach()->swapPositions(); //swap peach and yoshi
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			peach_activated = true;
 			yoshi_activated = true;
@@ -511,7 +508,7 @@ void EventSquare::doSomething() {
 				yoshi_activated = true;
 			}
 			if (y == 2) {
-				getWorld()->getYoshi()->swapPositions(); //will this work if I just pass in peach?? I think so... maybe not...
+				getWorld()->getYoshi()->swapPositions(); ///swap yoshi and peach
 				getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 				peach_activated = true;
 				yoshi_activated = true;
@@ -533,21 +530,19 @@ void DroppingSquare::doSomething() { //havent tested dropping square check when 
 		int r;
 		r = randInt(1, 2);
 		if (r == 1) {
-			if (getWorld()->getPeach()->checkCoins() >= 10) {
+			if (getWorld()->getPeach()->checkCoins() >= 10) { //take coins from actor
 				getWorld()->getPeach()->takeCoinsfromActor(10);
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				peach_activated = true;
 			}
-			if (peach_activated = true) return; //if 1st condition is true dont keep taking coins until 0
-
-			if (getWorld()->getPeach()->checkCoins() < 10) {
+			else if (getWorld()->getPeach()->checkCoins() < 10) {
 				getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				peach_activated = true;
 			}
 		}
 		if (r == 2) {
-			if (getWorld()->getPeach()->checkStars() >= 1) {
+			if (getWorld()->getPeach()->checkStars() >= 1) { //take star from actor
 				getWorld()->getPeach()->takeStar();
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				peach_activated = true;
@@ -565,20 +560,18 @@ void DroppingSquare::doSomething() { //havent tested dropping square check when 
 		j = randInt(1, 2);
 		if (j == 1) {
 			if (getWorld()->getYoshi()->checkCoins() >= 10) {
-				getWorld()->getYoshi()->takeCoinsfromActor(10);
+				getWorld()->getYoshi()->takeCoinsfromActor(10); //take coins 
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				yoshi_activated = true;
 			}
-			if (yoshi_activated = true) return; //if 1st condition is true dont keep taking coins until 0
-
-			if (getWorld()->getYoshi()->checkCoins() < 10) {
+			else if (getWorld()->getYoshi()->checkCoins() < 10) {
 				getWorld()->getYoshi()->takeCoinsfromActor(getWorld()->getYoshi()->checkCoins());
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				yoshi_activated = true;
 			}
 		}
 		if (j == 2) {
-			if (getWorld()->getYoshi()->checkStars() >= 1) {
+			if (getWorld()->getYoshi()->checkStars() >= 1) { //take stars from actor
 				getWorld()->getYoshi()->takeStar();
 				getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
 				yoshi_activated = true;
@@ -590,19 +583,108 @@ void DroppingSquare::doSomething() { //havent tested dropping square check when 
 void Bowser::doSomething() { //then make bowsers functionality like Boo, just added like nachen says
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach())))
 		m_activatedPeach = false;
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())))
+		m_activatedYoshi = false;
 	if (checkPausedState() == true) {
 		if (m_activatedPeach == false) { //if boo is paused and peach lands on boo
 			if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
 				int randomOption = randInt(0, 1); //randomly decide to swap coins and stars with other player
 				if (randomOption == 0) {
-					getWorld()->getPeach()->takeMultipleStars(getWorld()->getPeach()->checkStars());
+					getWorld()->getPeach()->takeMultipleStars(getWorld()->getPeach()->checkStars()); 
 					getWorld()->getPeach()->takeCoinsfromActor(getWorld()->getPeach()->checkCoins());
 					getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
 					m_activatedPeach = true;
 				}
-				if (randomOption == 1)
+				if (randomOption == 1) {
 					return;
-				m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
+					m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
+				}
+			}
+		}
+		decrementPauseCounter();
+		if (checkPauseCounter() <= 0 && checkPausedState() == true) {
+			int randomSquares = randInt(1, 10);
+			Baddies::adjustSquaresToMove(randomSquares);
+			Baddies::adjustTicksToMove(randomSquares * 8);
+			startWalking();
+		}
+	}
+	if (checkPausedState() == false) {
+		int x, y;
+		getPositionInThisDirection(walkingDirection, 16, x, y); //check every position for validity in direction + 16
+		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
+			if (walkingDirection == right || walkingDirection == left) {
+				int a, b;
+				getPositionInThisDirection(up, 16, a, b); //check 90* for validity
+				if (getWorld()->validPos(a, b)) {
+					setDirection(right);
+					walkingDirection = up; //change direction to move up
+				}
+				else {
+					int e, f;
+					getPositionInThisDirection(down, 16, e, f); //check 270* for validity
+					if (getWorld()->validPos(e, f)) {
+						setDirection(right);
+						walkingDirection = down;
+					}
+					else {
+						if (walkingDirection == right) { //if only way is left, go left
+							setDirection(left);
+							walkingDirection = left;
+						}
+						else {
+							setDirection(right); //if going down and hit bottom, go right
+							walkingDirection = right;
+						}
+					}
+				}
+			}
+			else {
+				if (walkingDirection == up) { //if going up and hit top, go left
+					int m, n;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+					getPositionInThisDirection(right, 16, m, n);							//peach when going up and facing left, doesnt turn right
+					if (getWorld()->validPos(m, n)) {										//maybe just updating directional square so she faces right will fix this
+						setDirection(right);
+						walkingDirection = right;
+					}
+					int s, v;
+					getPositionInThisDirection(left, 16, s, v);
+					if (getWorld()->validPos(s, v)) {
+						setDirection(left);
+						walkingDirection = left;
+					}
+				}
+				if (walkingDirection == down) { //if walking down go right
+					//if valid direction right move right, if valid left move left
+					int g, h;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
+					getPositionInThisDirection(right, 16, g, h);							//peach when going up and facing left, doesnt turn right
+					if (getWorld()->validPos(g, h)) {										//maybe just updating directional square so she faces right will fix this
+						setDirection(right);
+						walkingDirection = right;
+					}
+					int j, k;
+					getPositionInThisDirection(left, 16, j, k);
+					if (getWorld()->validPos(j, k)) {
+						setDirection(left);
+						walkingDirection = left;
+					}
+				}
+			}
+		}
+		else {
+			moveAtAngle(walkingDirection, 2);
+			Baddies::adjustTicksToMove(-1);
+			if (Baddies::returnTicksToMove() <= 0) {
+				goBackToPaused();
+				adjustPauseCounterto180();
+				int oddsOfAddingDroppingSquare = randInt(1, 4);
+				if (oddsOfAddingDroppingSquare == 1) {
+
+					//add a dropping square below bowser
+					getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
+				}
+				if (oddsOfAddingDroppingSquare == 2 || oddsOfAddingDroppingSquare == 3 || oddsOfAddingDroppingSquare == 4)
+					return;
 			}
 		}
 	}
@@ -619,85 +701,11 @@ void Baddies::adjustTicksToMove(int n) { //make this boos functionality
 		ticks_to_move -= n;
 }
 
-void Baddies::BaddieMove() {
-	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
-	ticks_to_move--;
-	//std::cerr << ticks_to_move << "\n";
-	if (ticks_to_move <= 0) {
-		IAmPaused = true;
-		//std::cerr << "you hit the new wait to roll in playerMove\n";
-	}
-}
-
-void Baddies::moveRandomly() {
-	int x, y;
-	getPositionInThisDirection(walkingDirection, 16, x, y); //check every position for validity in direction + 16
-	if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
-		if (walkingDirection == right || walkingDirection == left) {
-			int a, b;
-			getPositionInThisDirection(up, 16, a, b); //check 90* for validity
-			if (getWorld()->validPos(a, b)) {
-				setDirection(right);
-				walkingDirection = up; //change direction to move up
-			}
-			else {
-				int e, f;
-				getPositionInThisDirection(down, 16, e, f); //check 270* for validity
-				if (getWorld()->validPos(e, f)) {
-					setDirection(right);
-					walkingDirection = down;
-				}
-				else {
-					if (walkingDirection == right) { //if only way is left, go left
-						setDirection(left);
-						walkingDirection = left;
-					}
-					else {
-						setDirection(right); //if going down and hit bottom, go right
-						walkingDirection = right;
-					}
-				}
-			}
-		}
-		else {
-			if (walkingDirection == up) { //if going up and hit top, go left
-				int m, n;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
-				getPositionInThisDirection(right, 16, m, n);							//peach when going up and facing left, doesnt turn right
-				if (getWorld()->validPos(m, n)) {										//maybe just updating directional square so she faces right will fix this
-					setDirection(right);
-					walkingDirection = right;
-				}
-				int s, v;
-				getPositionInThisDirection(left, 16, s, v);
-				if (getWorld()->validPos(s, v)) {
-					setDirection(left);
-					walkingDirection = left;
-				}
-			}
-			if (walkingDirection == down) { //if walking down go right
-				//if valid direction right move right, if valid left move left
-				int g, h;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
-				getPositionInThisDirection(right, 16, g, h);							//peach when going up and facing left, doesnt turn right
-				if (getWorld()->validPos(g, h)) {										//maybe just updating directional square so she faces right will fix this
-					setDirection(right);
-					walkingDirection = right;
-				}
-				int j, k;
-				getPositionInThisDirection(left, 16, j, k);
-				if (getWorld()->validPos(j, k)) {
-					setDirection(left);
-					walkingDirection = left;
-				}
-			}
-		}
-	}
-	else
-		BaddieMove(); //move if all positions are valid
-}
-
 void Boo::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach())))
 		m_activatedPeach = false;
+	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())))
+		m_activatedYoshi = false; //if boo is paused and yoshi lands on boo
 	if (checkPausedState() == true) {
 		if (m_activatedPeach == false) { //if boo is paused and peach lands on boo
 			if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
@@ -710,9 +718,6 @@ void Boo::doSomething() {
 				m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
 			}
 		}
-
-	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())))
-		m_activatedYoshi = false; //if boo is paused and yoshi lands on boo
 	if (m_activatedYoshi == false) {
 		if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
 			int randomOption = randInt(1, 2); //randomly decide to swap stars or swap coins with players
@@ -803,7 +808,7 @@ void Boo::doSomething() {
 		else {
 			moveAtAngle(walkingDirection, 2);
 			Baddies::adjustTicksToMove(-1);
-			if (Baddies::returnTicksToMove() == 0) {
+			if (Baddies::returnTicksToMove() <= 0) {
 				goBackToPaused();
 				adjustPauseCounterto180();
 			}
@@ -814,9 +819,9 @@ void Boo::doSomething() {
 
 void Vortex::doSomething() {
 	int a, b;
-	getPositionInThisDirection(firing_direction, 2, a, b);
-	moveAtAngle(firing_direction, 2);
-
+	getPositionInThisDirection(firing_direction, 2, a, b); //move vector in direction until off the screen
+	moveAtAngle(firing_direction, 2);						//studentWorld handles impact
+															//only checking for screen exit here
 	if (a < 0 || a >= SPRITE_WIDTH * 16 || b < 0 || b >= SPRITE_HEIGHT * 16) {
 		isActive = false;
 	}

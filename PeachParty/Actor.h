@@ -4,20 +4,23 @@
 #include "GraphObject.h"
 
 class StudentWorld;
-/*
- 
- 
- 
- 
- 
- 
- 
-			PlayerActor
-	Alive Actor
-Actor		Baddies
-			Coin Square
-	
-
+/*													GraphObject
+//														|
+//													  Actor
+//													/       \
+//											AliveActor		PlayerActor
+//												/	\
+//											   /	 \
+// [Vortex, CoinSquare, EventSquare, StarSquare,     \
+// BankSquare, Directional Square, DroppingSquare]    \
+//														Baddies
+//														/   \
+//													  Boo	 Bowser
+//
+//
+//
+//	
+//
 */
 
 
@@ -32,7 +35,7 @@ public:
 	StudentWorld* getWorld() { return m_world; };
 	virtual bool canBeHitByVortex() const = 0;
 	virtual void hitByVortex() { }
-	bool isActive() const { return m_ObjectActive; }
+	bool isActive() const { return m_ObjectActive; } //active flag in all actors to tell StudentWorld if actor should be alive
 	void setInactive() { m_ObjectActive = false; }
 	void reActivate() { m_ObjectActive = true; }
 	bool canWalk(int x, int y, int direction);
@@ -55,11 +58,11 @@ public:
 
 	virtual void doSomething();
 	//accessors
-	int checkCoins() { return coins; }
+	int checkCoins() { return coins; } 
 	int checkStars() { return stars; }
 	int checkTicks() { return ticks_to_move; }
 	int checkDirection() { return walkingDirection; }
-	void changeDirection(int direction) { walkingDirection = direction; if (direction == left) setDirection(180); else setDirection(0); }
+	void changeDirection(int direction) { walkingDirection = direction; if (direction == left) setDirection(180); else setDirection(0); } 
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
 	int getWalking(); //gets actual walking direction
@@ -111,7 +114,7 @@ public:
 	AliveActor(StudentWorld* world, int imageID, int startX, int startY, int startDirection, int depth) //took out imageID after world
 		: Actor(world, imageID, startX, startY, startDirection, 1, depth), activate(true) {}; //and here too
 	bool isActivated() { return activate; } //used to indicate if bowser, boo, etc are activated 
-	virtual void reActivate() { activate = true; }
+	virtual void reActivate() { activate = true; } //need to reactivate a actor
 	virtual void deactivate() { activate = false; }
 	virtual void doSomething() = 0;
 private:
@@ -125,7 +128,7 @@ public:
 		: AliveActor(sw, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, 0, 0), firing_direction(direction) {}
 	bool canBeHitByVortex() const { return false; }
 	void doSomething();
-	std::vector<Actor*> do_i_activate;
+	std::vector<Actor*> do_i_activate; //vector for vortexs 
 private:
 	int firing_direction;
 	bool isActive;
@@ -161,7 +164,7 @@ public:
 	DirectionalSquare(StudentWorld *world, int imageID, int startX, int startY, int spriteDirection) : //a forcing direction should be the same as a sprite direction
 		AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, spriteDirection, 1), 
 		theSpriteDirection(spriteDirection) {};
-	int getSpriteDirection() { return theSpriteDirection; }
+	int getSpriteDirection() { return theSpriteDirection; } //need to get DirectionalSquare direction from Board File
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
 private:
@@ -221,9 +224,7 @@ public:
 	void decrementTicksToMove() { if (ticks_to_move <= 0) return; ticks_to_move--; }
 	int returnTicksToMove() { return ticks_to_move; }
 
-	void BaddieMove();
 	void changeWalkingDirection(int n) { walkingDirection = n; }
-	void moveRandomly();
 	void startWalking() {IAmPaused = false; }
 	void goBackToPaused() { IAmPaused = true; }
 private:
