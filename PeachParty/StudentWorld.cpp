@@ -29,7 +29,7 @@ StudentWorld::StudentWorld(string assetPath)
 int StudentWorld::init()
 {
    
-        startCountdownTimer(99); //start countdown
+        startCountdownTimer(3); //start countdown
         string board_file = assetPath() + "board0" + to_string(getBoardNumber()) + ".txt"; 
         Board::LoadResult result = m_board->loadBoard(board_file);
         if (result == Board::load_fail_file_not_found)
@@ -97,33 +97,58 @@ int StudentWorld::init()
                 }
             }
         }
+
     return GWSTATUS_CONTINUE_GAME;
 }
 
 int StudentWorld::move()
 {
     if (timeRemaining() < 0) {
-        return GWSTATUS_PEACH_WON; //fix this if peach wins, do this else return yoshi wins, else return tie
+        playSound(SOUND_GAME_FINISHED);
+        if (getStars(m_peach) > getStars(m_yoshi)) {
+            setFinalScore(getStars(m_peach), getCoins(m_peach));
+            return GWSTATUS_PEACH_WON;
+        }
+        else if (getStars(m_yoshi) > getStars(m_peach)) {
+            setFinalScore(getStars(m_yoshi), getCoins(m_yoshi));
+            return GWSTATUS_YOSHI_WON;
+        }
+        else if (getStars(m_peach) == getStars(m_yoshi) && getCoins(m_peach) > getCoins(m_yoshi)) {
+            setFinalScore(getStars(m_peach), getCoins(m_peach));
+            return GWSTATUS_PEACH_WON;
+        }
+        else if (getStars(m_peach) == getStars(m_yoshi) && getCoins(m_peach) < getCoins(m_yoshi)) {
+            setFinalScore(getStars(m_yoshi), getCoins(m_yoshi));
+            return GWSTATUS_YOSHI_WON;
+        }
+        else {
+            setFinalScore(getStars(m_peach), getCoins(m_peach));
+            return GWSTATUS_PEACH_WON;
+        }
     }
     m_peach->doSomething(); //tell peach to do something
     m_yoshi->doSomething(); //tell yoshi to do something
     for (Actor* a : actors) { //all actors need to do there "something"
         a->doSomething();
     }
-    return GWSTATUS_CONTINUE_GAME;
-
-    std::ostringstream oss;
-
-    oss.fill('0');
-    oss << "Roll: ";
-  //  oss << setw(6) << returnPlayer(getPlayerNumber())->checkTicks()/8 << "  ";
-
-    oss << "Stars: ";
-    //oss << returnPlayer(getPlayerNumber())-> checkStars() << "  ";
-
-
+    std::ostringstream oss; //may have to debug this
+    oss << "P1 ";
+    oss << "Roll: " << getTicks(m_peach) << " ";
+    oss << setw(2) << "Stars: " << getStars(m_peach) << " ";
+    oss << setw(2) << "$$: " << getCoins(m_peach) << " ";
+    if (m_peach->checkIfHasVortex() == true) {
+        oss << setw(2) << "VOR" << "  ";
+    }
+    oss << setw(2) << "| Time: " << timeRemaining() << " ";
+    oss << setw(2) << "| Bank: " << getBankCoins() << " ";
+    oss << setw(2) << "| P2 ";
+    oss << setw(2) << "Roll: " << getTicks(m_yoshi) << " ";
+    oss << setw(2) << "Stars: " << getStars(m_yoshi) << " ";
+    oss << setw(2) << "$$: " << getCoins(m_yoshi) << " ";
+    if (m_yoshi->checkIfHasVortex() == true) {
+        oss << setw(2) << "VOR" << " ";
+    }
     setGameStatText(oss.str());
-
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -180,10 +205,12 @@ void StudentWorld::addEventSquare(double x, double y) {
 
 void StudentWorld::addBowser(int x, int y) {
     actors.push_back(new Bowser(this, IID_BOWSER, x, y));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
 }
 
 void StudentWorld::addBoo(int x, int y) {
     actors.push_back(new Boo(this, IID_BOO, x, y));
+    actors.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, x, y, true));
 }
 
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
@@ -196,6 +223,18 @@ PlayerActor* StudentWorld::getYoshi() { //returns yoshi pointer for functions
 
 int StudentWorld::getBankCoins() {
     return m_bankCoins;
+}
+
+int StudentWorld::getTicks(PlayerActor* a) {
+    return a->checkTicks() / 8;
+}
+
+int StudentWorld::getStars(PlayerActor* a) {
+    return a->checkStars();
+}
+
+int StudentWorld::getCoins(PlayerActor* a) {
+    return a->checkCoins();
 }
 
 void StudentWorld::addCoinstoBank(int n) {

@@ -47,6 +47,9 @@ public:
   bool isThereASquareAtLocation(int dest_x ,int dest_y) const;
   Actor* getRandomSquare(double x, double y) const;
   Board* getBoard() { return m_board; }
+  int getTicks(PlayerActor* a);
+  int getStars(PlayerActor* a);
+  int getCoins(PlayerActor* a);
 
   bool intersecting(double x1, double y1, double x2, double y2);
   bool intersecting(Actor* a, Actor* b);

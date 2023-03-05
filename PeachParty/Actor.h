@@ -69,6 +69,7 @@ public:
 	void setWalking(int n);
 	void moveAtFork();
 	int getAngle() { return walkingDirection; }
+	bool checkIfHasVortex() { return hasAVortex; }
 
 	//mutators
 	void addMultipleStars(int n);
@@ -88,8 +89,8 @@ public:
 	void takeCoinsfromActor(int n);
 	void giveStar();
 	void takeStar();
-	void giveVortex() { vortexCount++; }
-	void removeVortex() { vortexCount--; }
+	void giveVortex() { hasAVortex = true;  vortexCount++; }
+	void removeVortex() { vortexCount--; if (vortexCount <= 0) hasAVortex = false; }
 
 private:
 	void playerMove();
@@ -206,7 +207,7 @@ class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
 public:
 	Baddies(StudentWorld* sw, int imageID, int startX, int startY, int dir, double size, int depth, //activate = waking or paused state
 		bool activate_when_go_lands, int num_sq_to_move, int number_of_ticks_to_pause) :
-		AliveActor(sw, imageID, startX, startY, dir, size), startInPausedState(activate_when_go_lands), numberOfTicksPaused(number_of_ticks_to_pause), 
+		AliveActor(sw, imageID, startX, startY, dir, depth), startInPausedState(activate_when_go_lands), numberOfTicksPaused(number_of_ticks_to_pause), 
 		squaresToMove(num_sq_to_move) {}			//num to move is num pixels to move
 	virtual void doSomething() = 0;		//ticks to pause starts as 180 ticks until pause
 	bool canBeHitByVortex() const { return true; }

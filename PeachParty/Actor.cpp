@@ -7,19 +7,19 @@ class StudentWorld;
 
 bool Actor::canWalk(int x, int y, int direction) {
 	if (direction == right) {
-		if (getWorld()->getBoard()->getContentsOf((x/16) + 1, (y/16)) == Board::empty)
+		if (getWorld()->getBoard()->getContentsOf((x/16) + 1, (y/16)) == Board::GridEntry::empty)
 			return false;
 	}
 	if (direction == up) {
-		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) + 1) == Board::empty)
+		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) + 1) == Board::GridEntry::empty)
 			return false;
 	}
 	if (direction == left) {
-		if (getWorld()->getBoard()->getContentsOf((x/16) - 1, (y/16)) == Board::empty)
+		if (getWorld()->getBoard()->getContentsOf((x/16) - 1, (y/16)) == Board::GridEntry::empty)
 			return false;
 	}
 	if (direction == down) {
-		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) - 1) == Board::empty)
+		if (getWorld()->getBoard()->getContentsOf((x/16), (y/16) - 1) == Board::GridEntry::empty)
 			return false;
 	}
 	return true;
@@ -42,28 +42,27 @@ bool Actor::isAtFork() {
 }
 
 void PlayerActor::moveAtFork() {
-	//int currentDirection = getAngle();
 	int playerInput = getWorld()->getAction(getPlayerNumber());
 	if (playerInput == ACTION_UP && canWalk(getX(), getY(), up)) {
 		std::cerr << "your input is fine\n";
 		changeDirection(up);
-		//isForked = false;
+		isForked = true;
 		startWalking();
 	}
 	if (playerInput == ACTION_RIGHT && canWalk(getX(), getY(), right)) {
 		std::cerr << "your input is fine\n";
 		changeDirection(right);
-		//isForked = true;
+		isForked = true;
 		startWalking();
 	}
 	if (playerInput == ACTION_LEFT && canWalk(getX(), getY(), left)) {
 		changeDirection(left);
-		//isForked = true;
+		isForked = true;
 		startWalking();
 	}
 	if (playerInput == ACTION_DOWN && canWalk(getX(), getY(), down)) {
 		changeDirection(down);
-		//isForked = false;
+		isForked = true;
 		startWalking();
 	}
 	else
@@ -75,16 +74,13 @@ void PlayerActor::playerMove() {
 	moveAtAngle(walkingDirection, 2); //move two pixels in desired direction
 	ticks_to_move--;
 	std::cerr << ticks_to_move << "\n";
-	if (ticks_to_move == 0) {
+	if (ticks_to_move <= 0) {
 		waitToRoll();
 		std::cerr << "you hit the new wait to roll in playerMove\n";
 	}
 }
 
 void PlayerActor::doSomething() {
-	//if (checkRollStatus() == true && isForked == true) {
-	//	std::cerr << "entered new fork statement\n";
-	//	moveAtFork(); //forked is broken }
 	if (checkRollStatus() == true) { //if waiting to roll
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //and tab is hit
 			int die_roll = randInt(1, 10); //walk a random number of steps
@@ -95,20 +91,17 @@ void PlayerActor::doSomething() {
 		if (getWorld()->getAction(getPlayerNumber()) == ACTION_FIRE) {
 
 		}
-		/*else if (getWorld()->getAction(getPlayerNumber()) == ACTION_RIGHT) {
-			std::cerr << "input worked\n";
-			changeDirection(right);
-			startWalking();
-		}*/
 		else return;
 	}
 	else if (checkRollStatus() == false) { //if Walking
-	
-		//if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) { //add condition for directional square && isForked == false
-		//	waitToRoll();
-		//	std::cerr << "you set wait to roll after seeing at fork\n";
-		//	return;
-		//}
+		if (!(getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) && isForked == true) {
+			isForked = false;
+		}
+		if (getWorld()->returnPlayer(getPlayerNumber())->isAtFork() && isForked == false) {// && isForked == false) {
+			moveAtFork();					//add condition for directional square && isForked == false
+			std::cerr << "you set wait to roll after seeing at fork\n";
+			return;
+		}
 		int x, y;
 		getPositionInThisDirection(getWalking(), 16, x, y); //check every position for validity in direction + 16
 		if ((x % 16 == 0 && y % 16 == 0) && !(getWorld()->validPos(x, y))) {
@@ -139,7 +132,7 @@ void PlayerActor::doSomething() {
 				}
 			}
 			else {
-				if (walkingDirection == up){ //if going up and hit top, go left
+				if (walkingDirection == up) { //if going up and hit top, go left
 					int m, n;                                                             //bugs, when hitting diretional square from lef tto down, peach doesnt turn to the right
 					getPositionInThisDirection(right, 16, m, n);							//peach when going up and facing left, doesnt turn right
 					if (getWorld()->validPos(m, n)) {										//maybe just updating directional square so she faces right will fix this
@@ -175,6 +168,7 @@ void PlayerActor::doSomething() {
 		}
 	}
 }
+	//}
 
 int PlayerActor::getPlayerNumber() {
 	return m_num;
@@ -301,7 +295,7 @@ void CoinSquare::doSomething() {
 		if (giveColor() == true) { //if color is blue add coins
 			getWorld()->getPeach()->giveCoinstoActor(3);
 			getWorld()->playSound(SOUND_GIVE_COIN);
-			//std::cerr << getWorld()->getPeach()->checkCoins();
+			std::cerr << getWorld()->getPeach()->checkCoins();
 			peach_activated = true;
 		}
 		if (giveColor() == false) { //if color is red subtract coins
