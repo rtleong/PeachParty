@@ -596,6 +596,7 @@ void Baddies::adjustTicksToMove(int n) { //make this boos functionality
 void Baddies::moveRandomly() {
 	int randomSquares = randInt(1, 3);
 	Baddies::adjustSquaresToMove(randomSquares);
+	std::cerr << checkSquaresToMove() << "\n";
 	Baddies::adjustTicksToMove(randomSquares * 8);
 	//1.generate random direction 
 	//2. check if that move is valid.
@@ -643,20 +644,22 @@ void Baddies::moveRandomly() {
 void Boo::doSomething() {
 	if (!(getWorld()->intersecting(this, getWorld()->getPeach())))
 		m_activatedPeach = false;
-	if (checkPausedState() == true && m_activatedPeach == false) { //if boo is paused and peach lands on boo
-		if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
-			int randomOption = randInt(1, 2); //randomly decide to swap coins and stars with other player
-			if (randomOption == 1)
-				getWorld()->getPeach()->swapCoins();
-			if (randomOption == 2)
-				getWorld()->getPeach()->swapStars();
-			getWorld()->playSound(SOUND_BOO_ACTIVATE);
-			m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
+	if (checkPausedState() == true) {
+		if (m_activatedPeach == false) { //if boo is paused and peach lands on boo
+			if (getWorld()->intersecting(this, getWorld()->getPeach()) && getWorld()->getPeach()->checkRollStatus() == true) {
+				int randomOption = randInt(1, 2); //randomly decide to swap coins and stars with other player
+				if (randomOption == 1)
+					getWorld()->getPeach()->swapCoins();
+				if (randomOption == 2)
+					getWorld()->getPeach()->swapStars();
+				getWorld()->playSound(SOUND_BOO_ACTIVATE);
+				m_activatedPeach = true; //reactivates peach so shes not duplicately interacted with 
+			}
 		}
-	}
+
 	if (!(getWorld()->intersecting(this, getWorld()->getYoshi())))
 		m_activatedYoshi = false; //if boo is paused and yoshi lands on boo
-	if (checkPausedState() == true && m_activatedYoshi == false) {
+	if (m_activatedYoshi == false) {
 		if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
 			int randomOption = randInt(1, 2); //randomly decide to swap stars or swap coins with players
 			if (randomOption == 1)
@@ -668,9 +671,12 @@ void Boo::doSomething() {
 		}
 	}
 	decrementPauseCounter();
-	if (&Baddies::checkPauseCounter == 0) {
+	std::cerr << checkPauseCounter();
+	if (checkPauseCounter() <= 0) {
+		std::cerr << "you called moveRandomly";
 		moveRandomly();
 	}
+}
 	else if (checkPausedState() == false) {
 		if (isAtFork() && (getX() % 16 == 0 && getY() % 16 == 0)) {
 			moveRandomly();
@@ -737,12 +743,13 @@ void Boo::doSomething() {
 			}
 		}
 	}
-	else
+	else{
 		moveAtAngle(walkingDirection, 2);
 	Baddies::adjustTicksToMove(-1);
 	if (Baddies::returnTicksToMove() == 0) {
 		goBackToPaused();
 		adjustPauseCounterto180();
+		}
 	}
 }
 

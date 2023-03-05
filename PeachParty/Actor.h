@@ -217,6 +217,7 @@ public:
 	void adjustPauseCounterto180() { numberOfTicksPaused = 180; }
 	int checkPauseCounter() { return numberOfTicksPaused; }
 	void adjustSquaresToMove(int n);
+	int checkSquaresToMove() { return squaresToMove; }
 	void adjustTicksToMove(int n);
 	void decrementTicksToMove() { if (ticks_to_move <= 0) return; ticks_to_move--; }
 	int returnTicksToMove() { return ticks_to_move; }
