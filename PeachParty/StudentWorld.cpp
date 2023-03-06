@@ -132,6 +132,19 @@ int StudentWorld::move()
     for (Actor* a : actors) { //all actors need to do there "something"
         a->doSomething();
     }
+    for (vector<Actor*>::iterator p = actors.begin(); p != actors.end();) {
+        if ((*p) == nullptr) {
+            continue;
+        }
+        if ((*p)->isActive()) {
+            p++;
+        }
+        else {
+            delete* p;
+            p = actors.erase(p);
+        }
+    }
+
     //string display on screen
     std::ostringstream oss; //may have to debug this
     oss << "P1 ";
@@ -139,7 +152,7 @@ int StudentWorld::move()
     oss << setw(2) << "Stars: " << getStars(m_peach) << " ";
     oss << setw(2) << "$$: " << getCoins(m_peach) << " ";
     if (m_peach->checkIfHasVortex() == true) {
-        oss << setw(2) << "VOR" << "  ";
+        oss << setw(2) << "VOR" << " ";
     }
     oss << setw(2) << "| Time: " << timeRemaining() << " ";
     oss << setw(2) << "| Bank: " << getBankCoins() << " ";
@@ -174,6 +187,7 @@ void StudentWorld::cleanUp()
     delete m_board; //delete board pointer
     m_board = nullptr;
 }
+
 
 void StudentWorld::addPlayerActor(double x, double y) {
     m_peach = new PlayerActor(this,IID_PEACH, x, y, 1); //add peach
@@ -219,6 +233,33 @@ void StudentWorld::addVortex(int x, int y, int direction) {
     actors.push_back(new Vortex(this, IID_VORTEX, x, y, direction));
 }
 
+Actor* StudentWorld::getSquareAtLocation (int x, int y) const {
+    vector<Actor*>::const_iterator it;
+    it = actors.begin();
+    while (it != actors.end()) {
+        if ((*it)->getX() == x && (*it)->getY() == y && (*it)->isASquare()) {
+            return *it;
+        }
+        it++;
+    }
+    return nullptr;
+}
+
+void StudentWorld::addDroppingSquare(int x, int y) {
+    vector<Actor*>::iterator it = actors.begin();
+    while (it != actors.end()) {
+        if ((*it)->getX() == x && (*it)->getY() == y && (*it)->isASquare()) {
+            std::cerr << "delete items\n";
+            delete (*it);
+            it = actors.erase(it);
+        }
+        else {
+            it++;
+        }
+    }
+    actors.push_back(new DroppingSquare(this, IID_DROPPING_SQUARE, x, y));
+}
+
 PlayerActor* StudentWorld::getPeach() { //returns peach pointer for functions
     return m_peach;
 }
@@ -250,13 +291,6 @@ void StudentWorld::addCoinstoBank(int n) {
 void StudentWorld::setBankBalanceToZero() {
     m_bankCoins = 0;
 }
-
-//Actor* StudentWorld::getRandomSquare(double x, double y) const {
-//    //if (isThereASquareAtLocation(x, y) == true) {
-//    //    return actors;
-//    //}
-//    return;
-//}
 
 bool StudentWorld::isThereASquareAtLocation(int x, int y) const {
     Board::GridEntry grent = m_board->getContentsOf(int(x), int(y));

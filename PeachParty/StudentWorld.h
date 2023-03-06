@@ -37,7 +37,8 @@ public:
   void addBowser(int x, int y);
   void addBoo(int x, int y);
   void addVortex(int x, int y, int direction);
-
+  void addDroppingSquare(int x, int y);
+  Actor* getSquareAtLocation(int x, int y) const;
   //mutators
   
 

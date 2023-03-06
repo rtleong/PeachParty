@@ -78,14 +78,15 @@ void PlayerActor::playerMove() {
 }
 
 void PlayerActor::doSomething() {
-	if (checkRollStatus() == true) { //if waiting to roll
-		if (getWorld()->getAction(getPlayerNumber()) == ACTION_ROLL) { //and tab is hit
+	if (checkRollStatus() == true) {
+		int x = getWorld()->getAction(getPlayerNumber());
+		if (x == ACTION_ROLL) { //and tab is hit
 			int die_roll = randInt(1, 10); //walk a random number of steps
 			ticks_to_move = die_roll * 8;
 			startWalking();
 			//std::cerr << "pressed tab\n";
 		}
-		if (getWorld()->getAction(getPlayerNumber()) == ACTION_FIRE) {
+		else if (x == ACTION_FIRE) {
 			if (checkIfHasVortex()) { //shoot vortex
 				int a, b;
 				getPositionInThisDirection(getWalking(), 16, a, b);
@@ -93,10 +94,11 @@ void PlayerActor::doSomething() {
 				getWorld()->playSound(SOUND_PLAYER_FIRE);
 				vortexCount = 0;
 				hasAVortex = false;
+				//std::cerr << "reached here to vortex\n";
+				}
 			}
+			else return;
 		}
-		else return;
-	}
 	else if (checkRollStatus() == false) { //if Walking
 		/*if (!(getWorld()->returnPlayer(getPlayerNumber())->isAtFork()) && isForked == true) {
 			isForked = false;
@@ -279,7 +281,7 @@ void PlayerActor::teleportToRandomSquare() { //teleport player to random square
 		int y = randInt(0, 15);
 		x = x * 16; y = y * 16;
 		if (getWorld()->validPos(x, y)) {
-			std::cerr << "get to move\n";
+			
 			(getWorld()->returnPlayer(getPlayerNumber()))->moveTo(x, y);
 			keepTrying = false;
 		}
@@ -300,7 +302,7 @@ void CoinSquare::doSomething() {
 		if (giveColor() == true) { //if color is blue add coins
 			getWorld()->getPeach()->giveCoinstoActor(3);
 			getWorld()->playSound(SOUND_GIVE_COIN);
-			std::cerr << getWorld()->getPeach()->checkCoins();
+			
 			peach_activated = true;
 		}
 		if (giveColor() == false) { //if color is red subtract coins
@@ -495,6 +497,7 @@ void EventSquare::doSomething() {
 		}
 		if (x == 3) {
 			getWorld()->getPeach()->giveVortex();
+			peach_activated = true;
 		}
 	}
 		if (getWorld()->intersecting(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->checkRollStatus() == true) {
@@ -515,6 +518,7 @@ void EventSquare::doSomething() {
 			}
 			if (y == 3) {
 				getWorld()->getYoshi()->giveVortex();
+				yoshi_activated = true;
 			}
 		}
 	}
@@ -680,7 +684,10 @@ void Bowser::doSomething() { //then make bowsers functionality like Boo, just ad
 				int oddsOfAddingDroppingSquare = randInt(1, 4);
 				if (oddsOfAddingDroppingSquare == 1) {
 
-					//add a dropping square below bowser
+					////add a dropping square below bowser
+					//std::cerr << "added dropping square\n";
+					//getWorld()->getSquareAtLocation(getX(), getY())->setInactive();
+					//getWorld()->addDroppingSquare(getX(), getY());
 					getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
 				}
 				if (oddsOfAddingDroppingSquare == 2 || oddsOfAddingDroppingSquare == 3 || oddsOfAddingDroppingSquare == 4)
@@ -730,12 +737,12 @@ void Boo::doSomething() {
 		}
 	}
 	decrementPauseCounter();
-	std::cerr << checkPauseCounter();
+	//std::cerr << checkPauseCounter();
 	if (checkPauseCounter() <= 0 && checkPausedState() == true) {
-		std::cerr << "you called moveRandomly";
+		//std::cerr << "you called moveRandomly";
 		int randomSquares = randInt(1, 3);
 	Baddies::adjustSquaresToMove(randomSquares);
-	std::cerr << checkSquaresToMove() << "\n";
+	//std::cerr << checkSquaresToMove() << "\n";
 	Baddies::adjustTicksToMove(randomSquares * 8);
 	startWalking();
 	}

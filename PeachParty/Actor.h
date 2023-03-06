@@ -35,6 +35,7 @@ public:
 	StudentWorld* getWorld() { return m_world; };
 	virtual bool canBeHitByVortex() const = 0;
 	virtual void hitByVortex() { }
+	virtual bool isASquare() { return m_squareStatus; }
 	bool isActive() const { return m_ObjectActive; } //active flag in all actors to tell StudentWorld if actor should be alive
 	void setInactive() { m_ObjectActive = false; }
 	void reActivate() { m_ObjectActive = true; }
@@ -43,6 +44,7 @@ public:
 private:
 	StudentWorld* m_world;
 	bool m_ObjectActive = true;
+	bool m_squareStatus = true;
 };
 
 /*
@@ -94,7 +96,6 @@ public:
 	void takeStar();
 	void giveVortex() { hasAVortex = true;  vortexCount++; }
 	void removeVortex() { vortexCount--; if (vortexCount <= 0) hasAVortex = false; }
-
 private:
 	void playerMove();
 	int stars;
@@ -132,6 +133,7 @@ public:
 private:
 	int firing_direction;
 	bool isActive;
+	bool m_squareStatus = false;
 };
 
 class CoinSquare : public AliveActor {
@@ -146,6 +148,7 @@ private:
 	bool colorOfSquare;
 	bool peach_activated;
 	bool yoshi_activated;
+	bool m_squareStatus = true;
 };
 
 class StarSquare : public AliveActor {
@@ -157,6 +160,7 @@ public:
 private:
 	bool peach_activated;
 	bool yoshi_activated;
+	bool m_squareStatus = true;
 };
 
 class DirectionalSquare : public AliveActor {
@@ -167,8 +171,10 @@ public:
 	int getSpriteDirection() { return theSpriteDirection; } //need to get DirectionalSquare direction from Board File
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	
 private:
 	int theSpriteDirection;
+	bool m_squareStatus = true;
 };
 
 class BankSquare : public AliveActor {
@@ -180,6 +186,7 @@ public:
 private:
 	bool peach_activated;
 	bool yoshi_activated;
+	bool m_squareStatus = true;
 };
 
 class EventSquare : public AliveActor {
@@ -191,6 +198,7 @@ public:
 private:
 	bool peach_activated;
 	bool yoshi_activated;
+	bool m_squareStatus = true;
 };
 
 class DroppingSquare : public AliveActor {
@@ -202,6 +210,7 @@ public:
 private:
 	bool peach_activated;
 	bool yoshi_activated;
+	bool m_squareStatus = true;
 };
 
 class Baddies : public AliveActor //Actor --> AliveActor --> Baddies
@@ -244,7 +253,8 @@ public:
 private:
 	bool m_activatedPeach = false;
 	bool m_activatedYoshi = false;
-	int walkingDirection;
+	int walkingDirection; 
+	bool m_squareStatus = false;
 };
 
 class Bowser : public Baddies //Baddies --> Bowser
@@ -253,10 +263,13 @@ public:
 	Bowser(StudentWorld* sw, int imageID, int startX, int startY) : 
 		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180), walkingDirection(right) {}
 	void doSomething();
+	bool getBowser() { return isBowser; }
 private:
+	bool isBowser = true;
 	bool m_activatedPeach = false;
 	bool m_activatedYoshi = false;
 	int walkingDirection;
+	bool m_squareStatus = false;
 };
 
 
