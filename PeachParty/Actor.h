@@ -36,11 +36,14 @@ public:
 	virtual bool canBeHitByVortex() const = 0;
 	virtual void hitByVortex() { }
 	virtual bool isASquare() { return m_squareStatus; }
-	bool isActive() const { return m_ObjectActive; } //active flag in all actors to tell StudentWorld if actor should be alive
-	void setInactive() { m_ObjectActive = false; }
-	void reActivate() { m_ObjectActive = true; }
+	virtual bool isActive() const { return m_ObjectActive; } //active flag in all actors to tell StudentWorld if actor should be alive
+	virtual void setInactive() { m_ObjectActive = false; }
+	virtual void reActivate() { m_ObjectActive = true; }
 	bool canWalk(int x, int y, int direction);
 	bool isAtFork();
+	virtual bool isBaddie() { return false; }
+	void baddieTeleport();
+	virtual bool isAVortex() { return false; }
 private:
 	StudentWorld* m_world;
 	bool m_ObjectActive = true;
@@ -68,6 +71,8 @@ public:
 	int getPlayerNumber();
 	bool checkRollStatus() { return waitingtoroll; }
 	int getWalking(); //gets actual walking direction
+	virtual bool isBaddie() { return false; }
+	bool isAVortex() { return false; }
 	//movement
 	void waitToRoll() { waitingtoroll = true; }
 	void startWalking() { waitingtoroll = false; }
@@ -107,6 +112,7 @@ private:
 	bool isForked = false;
 	int vortexCount = 0;
 	bool hasAVortex = false;
+	bool baddieStatus = false;
 };
 
 class AliveActor : public Actor //Actors -> alive actors 
@@ -118,6 +124,8 @@ public:
 	virtual void reActivate() { activate = true; } //need to reactivate a actor
 	virtual void deactivate() { activate = false; }
 	virtual void doSomething() = 0;
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool activate;
 };
@@ -130,10 +138,13 @@ public:
 	bool canBeHitByVortex() const { return false; }
 	void doSomething();
 	std::vector<Actor*> do_i_activate; //vector for vortexs 
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return true; }
 private:
 	int firing_direction;
 	bool isActive;
 	bool m_squareStatus = false;
+	bool baddieStatus = false;
 };
 
 class CoinSquare : public AliveActor {
@@ -144,11 +155,14 @@ public:
 	virtual void doSomething();
 	bool canBeHitByVortex() const { return false; }
 	bool giveColor() { return colorOfSquare; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool colorOfSquare;
 	bool peach_activated;
 	bool yoshi_activated;
 	bool m_squareStatus = true;
+	bool baddieStatus = false;
 };
 
 class StarSquare : public AliveActor {
@@ -157,6 +171,8 @@ public:
 		AliveActor(world, imageID, startX * SPRITE_WIDTH, startY * SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -171,6 +187,8 @@ public:
 	int getSpriteDirection() { return theSpriteDirection; } //need to get DirectionalSquare direction from Board File
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 	
 private:
 	int theSpriteDirection;
@@ -183,6 +201,8 @@ public:
 		AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -195,6 +215,8 @@ public:
 		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -207,6 +229,8 @@ public:
 		: AliveActor(world, imageID, startX* SPRITE_WIDTH, startY* SPRITE_HEIGHT, right, 1) {};
 	void doSomething();
 	bool canBeHitByVortex() const { return false; }
+	virtual bool isBaddie() { return false; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool peach_activated;
 	bool yoshi_activated;
@@ -232,6 +256,8 @@ public:
 	void adjustTicksToMove(int n);
 	void decrementTicksToMove() { if (ticks_to_move <= 0) return; ticks_to_move--; }
 	int returnTicksToMove() { return ticks_to_move; }
+	virtual bool isBaddie() { return true; }
+	virtual bool isAVortex() { return false; }
 
 	void changeWalkingDirection(int n) { walkingDirection = n; }
 	void startWalking() {IAmPaused = false; }
@@ -250,6 +276,8 @@ public:
 	Boo(StudentWorld* sw, int imageID, int startX, int startY) 
 	: Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180), walkingDirection(right) {}
 	void doSomething();
+	virtual bool isBaddie() { return true; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool m_activatedPeach = false;
 	bool m_activatedYoshi = false;
@@ -264,6 +292,8 @@ public:
 		Baddies(sw, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, right, 1, 0, true, 0, 180), walkingDirection(right) {}
 	void doSomething();
 	bool getBowser() { return isBowser; }
+	virtual bool isBaddie() { return true; }
+	virtual bool isAVortex() { return false; }
 private:
 	bool isBowser = true;
 	bool m_activatedPeach = false;

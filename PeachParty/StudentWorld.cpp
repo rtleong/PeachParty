@@ -145,6 +145,21 @@ int StudentWorld::move()
         }
     }
 
+    for (vector<Actor*>::iterator p = actors.begin(); p != actors.end(); p++) {
+        if ((*p) == nullptr) {
+            continue;
+        }
+        if ((*p)->isBaddie()) {
+            for (vector<Actor*>::iterator m = actors.begin(); m != actors.end(); m++) {
+                if (overlap(*p, *m) && (*m)->isAVortex() == true) {
+                    playSound(SOUND_HIT_BY_VORTEX);
+                    (*p)->baddieTeleport();
+                    (*m)->setInactive();
+                }
+            }
+        }
+    }
+
     //string display on screen
     std::ostringstream oss; //may have to debug this
     oss << "P1 ";

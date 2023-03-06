@@ -274,6 +274,19 @@ void PlayerActor::swapPositions() { //swap positions and status's with each othe
 	swapWalkingState();
 }
 
+void Actor::baddieTeleport() {
+	bool keepTrying = true;
+	while (keepTrying) {
+		int x = randInt(0, 15);
+		int y = randInt(0, 15);
+		x = x * 16; y = y * 16;
+		if (getWorld()->validPos(x, y)) {
+			moveTo(x, y);
+			keepTrying = false;
+		}
+	}
+}
+
 void PlayerActor::teleportToRandomSquare() { //teleport player to random square
 	bool keepTrying = true;
 	while (keepTrying){
